@@ -1,16 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { Wine } from '../../models/wine';
 import { WineService } from '../../services/wine.service';
 
+
 @Component({
   selector: 'app-wine-list',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule, RouterModule],
   template: `
     <div class="container">
       <h2>Wine List</h2>
+      <a [routerLink]="['/add-wine']">Add New Wine</a>
       <table>
         <thead>
           <tr>

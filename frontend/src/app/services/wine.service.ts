@@ -14,4 +14,8 @@ export class WineService {
   getWines(): Observable<Wine[]> {
     return this.http.get<Wine[]>(this.apiUrl);
   }
+
+  addWine(wine: Wine): Observable<Wine[]> {
+    return this.http.post<Wine[]>(this.apiUrl, wine);
+  }
 }
