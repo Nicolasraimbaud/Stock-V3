@@ -1,6 +1,9 @@
 export interface Wine {
     id?: number;
-    name: string;
+    millesime: number;
+    cuvee: string;
+    domaine: string;
+    appellation: string;
     quantity: number;
     price: number;
 }

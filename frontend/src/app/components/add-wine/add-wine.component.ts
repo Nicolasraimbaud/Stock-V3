@@ -11,35 +11,115 @@ import { WineService } from '../../services/wine.service';
   imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="container">
-      <h2>Add New Wine</h2>
-      <form (ngSubmit)="onSubmit()">
-        <div>
-          <label>Name:</label>
-          <input type="text" [(ngModel)]="wine.name" name="name" required>
+      <h2 class="title">🍷 Add New Wine</h2>
+      <form (ngSubmit)="onSubmit()" class="wine-form">
+        <div class="form-group">
+          <label for="millesime">Millésime:</label>
+          <input id="millesime" type="number" [(ngModel)]="wine.millesime" name="millesime" required>
         </div>
-        <div>
-          <label>Quantity:</label>
-          <input type="number" [(ngModel)]="wine.quantity" name="quantity" required>
+        <div class="form-group">
+          <label for="cuvee">Cuvée:</label>
+          <input id="cuvee" type="text" [(ngModel)]="wine.cuvee" name="cuvee" required>
         </div>
-        <div>
-          <label>Price:</label>
-          <input type="number" [(ngModel)]="wine.price" name="price" required>
+        <div class="form-group">
+          <label for="domaine">Domaine:</label>
+          <input id="domaine" type="text" [(ngModel)]="wine.domaine" name="domaine" required>
         </div>
-        <button type="submit">Add Wine</button>
+        <div class="form-group">
+          <label for="appellation">Appellation:</label>
+          <input id="appellation" type="text" [(ngModel)]="wine.appellation" name="appellation" required>
+        </div>
+        <div class="form-group">
+          <label for="price">Prix:</label>
+          <input id="price" type="number" [(ngModel)]="wine.price" name="price" required>
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantité:</label>
+          <input id="quantity" type="number" [(ngModel)]="wine.quantity" name="quantity" required>
+        </div>
+        <button type="submit" class="submit-button">Add Wine</button>
       </form>
     </div>
   `,
   styles: [`
-    .container { padding: 20px; }
-    form div { margin-bottom: 10px; }
-    label { display: inline-block; width: 70px; }
+    /* Container */
+    .container {
+      padding: 20px;
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      margin: 20px auto;
+    }
+
+    /* Title */
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #3e3e3e;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* Form */
+    .wine-form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+      color: #4caf50;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    input:focus {
+      border-color: #4caf50;
+      outline: none;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+
+    /* Submit Button */
+    .submit-button {
+      padding: 10px 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+      background-color: #4caf50;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .submit-button:hover {
+      background-color: #45a049;
+    }
   `]
 })
 export class AddWineComponent {
   wine: Wine = {
-    name: '',
-    quantity: 0,
-    price: 0
+    millesime: 0,
+    cuvee: '',
+    domaine: '',
+    appellation: '',
+    price: 0,
+    quantity: 0
   };
 
   constructor(
@@ -47,10 +127,20 @@ export class AddWineComponent {
     private router: Router
   ) { }
 
-  onSubmit() {
+  /*onSubmit() {
     this.wineService.addWine(this.wine).subscribe({
       next: () => this.router.navigate(['/wines']),
       error: (error) => console.error('Error adding wine:', error)
     });
-  }
+  }*/
+
+  onSubmit() {
+  this.wineService.addWineAndUpdateExcel(this.wine).subscribe({
+    next: () => {
+      console.log('Wine added and Excel updated');
+      this.router.navigate(['/wines']);
+    },
+    error: (error) => console.error('Error adding wine or updating Excel:', error)
+  });
+}
 }
