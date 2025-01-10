@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,55 +71,105 @@ public class ExcelService {
     public List<Wine> processExcelAndSaveToDb() {
         List<Wine> savedWines = new ArrayList<>();
         List<Map<String, String>> excelData = readExcelFile();
-
-        List<Wine> existingWines = wineRepository.findAll();
         Set<Wine> winesToKeep = new HashSet<>();
     
         for (Map<String, String> row : excelData) {
             try {
+                // Vérification des champs obligatoires
                 String appellation = row.get("Appellation");
                 String domaine = row.get("Domaine");
-                String cuvee = row.get("Cuvée");
-                Integer millesime = Integer.parseInt(row.get("Millésime").split(",")[0]);
+                String cuvee = row.get("Cuvee");
+                String region = row.get("Region");
+                String country = row.get("Country");
+                String supplier = row.get("Supplier");
+                String millesimeStr = row.get("Millesime");
+                String updatedStr = row.get("Updated");
+                LocalDate updatedDate = null;
+
+                if (updatedStr != null && !updatedStr.isEmpty()) {
+                    try {
+                        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME; // Adapter le format si nécessaire
+                        updatedDate = LocalDate.parse(updatedStr, formatter);
+                    } catch (DateTimeParseException e) {
+                        logger.error("Invalid date format for 'Updated': {}", updatedStr, e);
+                    }
+                }
     
+                if (appellation == null || domaine == null || cuvee == null || millesimeStr == null) {
+                    logger.error("Missing required fields in row: {}", row);
+                    continue;
+                }
+    
+                // Conversion des valeurs numériques
+                Double priceToBuy = parseDouble(row.get("Pricetobuy"));
+                Double priceToSell = parseDouble(row.get("Pricetosell"));
+                Double cost = parseDouble(row.get("Cost"));
+                Integer quantity;
+                Integer millesime;
+    
+                try {
+                    quantity = Integer.parseInt(row.get("Quantity").split(",")[0].trim());
+                } catch (NumberFormatException e) {
+                    logger.error("Invalid 'Quantity' value for row: {}", row);
+                    continue;
+                }
+    
+                try {
+                    millesime = Integer.parseInt(millesimeStr.split(",")[0].trim());
+                } catch (NumberFormatException e) {
+                    logger.error("Invalid 'Millésime' value for row: {}", row);
+                    continue;
+                }
+    
+                if (priceToBuy == null || priceToSell == null || cost == null) {
+                    logger.error("Invalid numeric fields in row: {}", row);
+                    continue;
+                }
+    
+                // Recherche ou création d'un vin
                 Wine wine = wineRepository
-                    .findByAppellationAndDomaineAndCuveeAndMillesime(
-                        appellation, domaine, cuvee, millesime
-                    )
+                    .findByAppellationAndDomaineAndCuveeAndMillesime(appellation, domaine, cuvee, millesime)
                     .orElse(new Wine());
     
+                // Mise à jour des champs
                 wine.setAppellation(appellation);
                 wine.setDomaine(domaine);
                 wine.setCuvee(cuvee);
                 wine.setMillesime(millesime);
-                wine.setPrice(Double.parseDouble(row.get("Prix").replace(",", ".")));
-                wine.setQuantity(Integer.parseInt(row.get("Quantité").split(",")[0]));
+                wine.setRegion(region);
+                wine.setCountry(country);
+                wine.setSupplier(supplier);
+                wine.setPricetobuy(priceToBuy);
+                wine.setPricetosell(priceToSell);
+                wine.setCost(cost);
+                wine.setQuantity(quantity);
+                wine.setUpdated(updatedDate);
     
-                Wine savedWine = wineRepository.save(wine);
-                savedWines.add(savedWine);
-                winesToKeep.add(savedWine);
-                logger.info("Saved/Updated wine: {} - {} - {} ({})", 
-                    wine.getAppellation(), 
-                    wine.getDomaine(), 
-                    wine.getCuvee(), 
-                    wine.getMillesime());
+                // Enregistrement dans la base de données
+                savedWines.add(wineRepository.save(wine));
+                winesToKeep.add(wine);
+                logger.info("Saved/Updated wine: {}", wine);
+    
             } catch (Exception e) {
                 logger.error("Error processing wine from row: {}", row, e);
             }
         }
-        
-        // Delete wines not in Excel
-        existingWines.stream()
-        .filter(wine -> !winesToKeep.contains(wine))
-        .forEach(wine -> {
-            wineRepository.delete(wine);
-            logger.info("Deleted wine: {} - {} - {} ({})", 
-                wine.getAppellation(), wine.getDomaine(), 
-                wine.getCuvee(), wine.getMillesime());
-        });
-
-    return savedWines;
+    
+        // Suppression des vins non présents dans Excel
+        wineRepository.findAll()
+            .stream()
+            .filter(wine -> !winesToKeep.contains(wine))
+            .forEach(wine -> {
+                wineRepository.delete(wine);
+                logger.info("Deleted wine: {} - {} - {} ({})",
+                            wine.getAppellation(), wine.getDomaine(),
+                            wine.getCuvee(), wine.getMillesime());
+            });
+    
+        return savedWines;
     }
+    
+    
 
     public List<Map<String, String>> readExcelFile() {
         List<Map<String, String>> data = new ArrayList<>();
@@ -164,7 +217,7 @@ public class ExcelService {
             row.createCell(1).setCellValue(newWine.getCuvee());
             row.createCell(2).setCellValue(newWine.getDomaine());
             row.createCell(3).setCellValue(newWine.getAppellation());
-            row.createCell(4).setCellValue(newWine.getPrice());
+            row.createCell(4).setCellValue(newWine.getPricetosell());
             row.createCell(5).setCellValue(newWine.getQuantity());
             
             // Write to existing Excel file
@@ -175,6 +228,23 @@ public class ExcelService {
         } catch (Exception e) {
             logger.error("Failed to update Excel file", e);
             throw new RuntimeException("Error updating Excel file", e);
+        }
+    }
+
+    public void saveWine(Wine wine) {
+        wineRepository.save(wine);
+    }
+
+    private Double parseDouble(String value) {
+        if (value == null || value.isEmpty()) {
+            return null; // Retourne null si la valeur est vide ou absente
+        }
+        try {
+            // Remplacer les virgules par des points
+            return Double.parseDouble(value.replace(",", ".").trim());
+        } catch (NumberFormatException e) {
+            logger.error("Invalid number format: {}", value, e);
+            return null; // Retourne null si la conversion échoue
         }
     }
 }

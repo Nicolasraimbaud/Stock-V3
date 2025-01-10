@@ -34,4 +34,8 @@ export class WineService {
       })
     );
   }
+
+  importExcelData(): Observable<any> {
+    return this.http.get(`${this.excelUrl}/import`);
+  }
 }

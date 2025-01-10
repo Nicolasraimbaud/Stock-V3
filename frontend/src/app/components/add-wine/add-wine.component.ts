@@ -31,7 +31,7 @@ import { WineService } from '../../services/wine.service';
         </div>
         <div class="form-group">
           <label for="price">Prix:</label>
-          <input id="price" type="number" [(ngModel)]="wine.price" name="price" required>
+          <input id="price" type="number" [(ngModel)]="wine.pricetosell" name="price" required>
         </div>
         <div class="form-group">
           <label for="quantity">Quantité:</label>
@@ -118,8 +118,14 @@ export class AddWineComponent {
     cuvee: '',
     domaine: '',
     appellation: '',
-    price: 0,
-    quantity: 0
+    pricetosell: 0,
+    quantity: 0,
+    region: '',
+    country: '',
+    pricetobuy: 0,
+    cost: 0,
+    updated: new Date('2025-01-01'),
+    supplier: ''
   };
 
   constructor(
