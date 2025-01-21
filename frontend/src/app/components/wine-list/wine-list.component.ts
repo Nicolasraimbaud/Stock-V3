@@ -12,9 +12,10 @@ import { WineService } from '../../services/wine.service';
   imports: [CommonModule, RouterModule],
   template: `
     <div class="container">
-      <h2 class="title">🍷 Wine List</h2>
-      <a class="add-link" [routerLink]="['/add-wine']">+ Add New Wine</a>
+      <a class="add-link" [routerLink]="['/wines']">Wine List</a>
+      <a class="add-link" [routerLink]="['/invoice']">Invoices</a>
       <a class="add-link" (click)="importExcelData()" class="add-link">Import Excel Data</a>
+      <a class="add-link" (click)="importExcelData()" class="add-link">Print Wine List</a>
       <table class="wine-table">
         <thead>
           <tr>

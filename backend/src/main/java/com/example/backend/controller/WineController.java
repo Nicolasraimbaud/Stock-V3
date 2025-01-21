@@ -2,7 +2,7 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Wine;
 import com.example.backend.repository.WineRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.backend.service.WineService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,17 +12,22 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:4200")
 public class WineController {
 
-    @Autowired
     private WineRepository wineRepository;
+    private WineService wineService;
+
+    public WineController(WineService wineService, WineRepository wineRepository) {
+        this.wineService = wineService;
+        this.wineRepository = wineRepository;
+    }
 
     @GetMapping
     public List<Wine> getAllWines() {
-        return wineRepository.findAll();
+        return wineService.getAllWinesSorted();
     }
 
     @PostMapping
     public Wine addWine(@RequestBody Wine wine) {
-        return wineRepository.save(wine);
+        return wineService.saveWine(wine);
     }
 
     @GetMapping("/{id}")
