@@ -20,86 +20,71 @@ public class LectureOcrService {
         this.dictionary = dictionaryService.loadDictionary();
     }
 
-    public List<Map<String, Object>> processAllFiles() throws TesseractException {
-        List<Map<String, Object>> results = new ArrayList<>();
-        String directoryPath = "src/main/resources/uploads";
-    
+    public Map<String, Object> processFile(String filePath) throws TesseractException {
+        File file = new File(filePath);
+        if (!file.exists() || !file.isFile()) {
+            throw new IllegalArgumentException("Le fichier " + filePath + " n'existe pas ou n'est pas un fichier valide.");
+        }
+
         // Initialisation de Tesseract
         Tesseract tesseract = new Tesseract();
         tesseract.setDatapath("src/main/resources/tessdata");
         tesseract.setLanguage("fra");
         tesseract.setVariable("preserve_interword_spaces", "1");
-    
-        File directory = new File(directoryPath);
-        if (!directory.exists() || !directory.isDirectory()) {
-            throw new IllegalArgumentException("Le dossier " + directoryPath + " n'existe pas ou n'est pas un dossier.");
+
+        Map<String, Object> fileResult = new HashMap<>();
+        try {
+            String text = tesseract.doOCR(file);
+
+            // Séparation des lignes
+            String[] lines = text.split("\n");
+            List<Map<String, String>> rows = extractColumns(lines);
+
+            // Filtrer les lignes valides
+            List<Map<String, String>> validRows = filterValidRows(rows);
+
+            fileResult.put("filename", file.getName());
+            fileResult.put("rows", validRows); // Ajouter uniquement les lignes valides
+        } catch (Exception e) {
+            fileResult.put("filename", file.getName());
+            fileResult.put("error", "Erreur lors du traitement : " + e.getMessage());
         }
-    
-        File[] files = directory.listFiles((dir, name) -> name.endsWith(".pdf") || name.endsWith(".png") || name.endsWith(".jpg"));
-        if (files == null || files.length == 0) {
-            throw new IllegalArgumentException("Aucun fichier trouvé dans le dossier " + directoryPath);
-        }
-    
-        for (File file : files) {
-            Map<String, Object> fileResult = new HashMap<>();
-            try {
-                String text = tesseract.doOCR(file);
-    
-                // Séparation des lignes
-                String[] lines = text.split("\n");
-                List<Map<String, String>> rows = extractColumns(lines);
-    
-                // Filtrer les lignes valides
-                List<Map<String, String>> validRows = filterValidRows(rows);
-    
-                fileResult.put("filename", file.getName());
-                fileResult.put("rows", validRows); // Ajouter uniquement les lignes valides
-            } catch (Exception e) {
-                fileResult.put("filename", file.getName());
-                fileResult.put("error", "Erreur lors du traitement : " + e.getMessage());
-            }
-            results.add(fileResult);
-        }
-    
-        return results;
+
+        return fileResult;
     }
 
     private List<Map<String, String>> extractColumns(String[] lines) {
         List<Map<String, String>> extractedData = new ArrayList<>();
         Map<String, String> previousRow = null;
-    
+
         for (String line : lines) {
             if (line.trim().isEmpty()) continue; // Ignorer les lignes vides
-    
+
             // Diviser la ligne en colonnes par espaces multiples
-            String[] columns = line.split("\\s{2,}"); // Deux espaces ou plus comme séparateur
-    
+            String[] columns = line.split("\\s{2,}");
+
             if (columns.length >= 5) {
-                // Ligne complète avec toutes les colonnes
                 Map<String, String> currentRow = new HashMap<>();
                 currentRow.put("Description", columns[0].trim());
                 currentRow.put("Unité", columns[1].trim());
                 currentRow.put("Qté", columns[2].trim());
                 currentRow.put("PU", columns[3].trim());
                 currentRow.put("Prix total", columns[4].trim());
-    
-                // Parse additional details from the description
+
                 currentRow.putAll(parseDescription(columns[0].trim()));
-    
+
                 extractedData.add(currentRow);
-                previousRow = currentRow; // Mettre à jour la ligne précédente
+                previousRow = currentRow;
             } else if (columns.length == 1 && previousRow != null) {
-                // Ligne incomplète : vérifier la taille pour une éventuelle fusion
                 String missingDescription = columns[0].trim();
                 String previousDescription = previousRow.get("Description");
-    
+
                 if (missingDescription.length() < previousDescription.length() * 0.5) {
                     String updatedDescription = previousDescription + " " + missingDescription;
                     previousRow.put("Description", updatedDescription);
-                    previousRow.putAll(parseDescription(updatedDescription)); // Reparse after merging
+                    previousRow.putAll(parseDescription(updatedDescription));
                     extractedData.set(extractedData.size() - 1, previousRow);
                 } else {
-                    // Traiter comme un bloc indépendant
                     Map<String, String> standaloneRow = new HashMap<>();
                     standaloneRow.put("Description", missingDescription);
                     standaloneRow.putAll(parseDescription(missingDescription));
@@ -107,16 +92,16 @@ public class LectureOcrService {
                     standaloneRow.put("Qté", "");
                     standaloneRow.put("PU", "");
                     standaloneRow.put("Prix total", "");
-    
+
                     extractedData.add(standaloneRow);
                 }
             }
         }
-    
+
         return extractedData.stream()
-                .map(this::reorderColumns) // Réorganiser les colonnes
+                .map(this::reorderColumns)
                 .collect(Collectors.toList());
-    }    
+    }
 
     private Map<String, String> parseDescription(String description) {
         Map<String, String> result = new HashMap<>();
@@ -243,18 +228,16 @@ public class LectureOcrService {
 
     private List<Map<String, String>> filterValidRows(List<Map<String, String>> rows) {
         return rows.stream()
-            .filter(row -> hasMinimumValidFields(row)) // Filtrer les lignes valides // Garder uniquement les lignes avec au moins 2 champs remplis
+            .filter(row -> hasMinimumValidFields(row))
             .collect(Collectors.toList());
     }
 
     private boolean hasMinimumValidFields(Map<String, String> row) {
-        // Compter le nombre de champs essentiels non vides
         int count = 0;
         if (!row.getOrDefault("Domaine", "").isEmpty()) count++;
         if (!row.getOrDefault("Appellation", "").isEmpty()) count++;
         if (!row.getOrDefault("Millésime", "").isEmpty()) count++;
-    
-        // Garder les lignes qui ont au moins 2 champs remplis
+
         return count >= 2;
     }
 }

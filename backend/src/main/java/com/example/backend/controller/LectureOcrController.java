@@ -15,14 +15,15 @@ public class LectureOcrController {
         this.lectureOcrService = lectureOcrService;
     }
 
-    @GetMapping("/read-all")
-    public ResponseEntity<?> readAllFiles() {
+    @GetMapping("/read-file")
+    public ResponseEntity<?> readFile(@RequestParam String filePath) {
         try {
-            // Appeler le service pour traiter tous les fichiers du dossier
-            var results = lectureOcrService.processAllFiles();
-            return ResponseEntity.ok(results);
+            var result = lectureOcrService.processFile(filePath);
+            return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Erreur : " + e.getMessage());
         }
     }
 }
+
