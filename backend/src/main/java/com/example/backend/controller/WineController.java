@@ -30,6 +30,11 @@ public class WineController {
         return wineService.saveWine(wine);
     }
 
+    @PostMapping("/add-ocr")
+    public List<Wine> addMultipleWinesFromOcr(@RequestBody List<Wine> wines) {
+        return wineService.saveAllWines(wines);
+    }
+
     @GetMapping("/{id}")
     public Wine getWineById(@PathVariable Long id) {
         return wineRepository.findById(id)

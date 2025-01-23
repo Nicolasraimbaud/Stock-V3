@@ -4,6 +4,7 @@ import com.example.backend.model.Dictionary;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,37 +21,43 @@ public class LectureOcrService {
         this.dictionary = dictionaryService.loadDictionary();
     }
 
-    public Map<String, Object> processFile(String filePath) throws TesseractException {
-        File file = new File(filePath);
-        if (!file.exists() || !file.isFile()) {
-            throw new IllegalArgumentException("Le fichier " + filePath + " n'existe pas ou n'est pas un fichier valide.");
-        }
-
-        // Initialisation de Tesseract
-        Tesseract tesseract = new Tesseract();
-        tesseract.setDatapath("src/main/resources/tessdata");
-        tesseract.setLanguage("fra");
-        tesseract.setVariable("preserve_interword_spaces", "1");
-
-        Map<String, Object> fileResult = new HashMap<>();
+    public Map<String, Object> processFile(MultipartFile file) throws TesseractException {
         try {
-            String text = tesseract.doOCR(file);
+            // Sauvegarder temporairement le fichier reçu pour OCR
+            File tempFile = File.createTempFile("ocr_", "_" + file.getOriginalFilename());
+            file.transferTo(tempFile);
 
-            // Séparation des lignes
-            String[] lines = text.split("\n");
-            List<Map<String, String>> rows = extractColumns(lines);
+            // Initialisation de Tesseract
+            Tesseract tesseract = new Tesseract();
+            tesseract.setDatapath("src/main/resources/tessdata");
+            tesseract.setLanguage("fra");
+            tesseract.setVariable("preserve_interword_spaces", "1");
 
-            // Filtrer les lignes valides
-            List<Map<String, String>> validRows = filterValidRows(rows);
+            Map<String, Object> fileResult = new HashMap<>();
+            try {
+                String text = tesseract.doOCR(tempFile);
 
-            fileResult.put("filename", file.getName());
-            fileResult.put("rows", validRows); // Ajouter uniquement les lignes valides
-        } catch (Exception e) {
-            fileResult.put("filename", file.getName());
-            fileResult.put("error", "Erreur lors du traitement : " + e.getMessage());
+                // Séparation des lignes
+                String[] lines = text.split("\n");
+                List<Map<String, String>> rows = extractColumns(lines);
+
+                // Filtrer les lignes valides
+                List<Map<String, String>> validRows = filterValidRows(rows);
+
+                fileResult.put("filename", file.getOriginalFilename());
+                fileResult.put("rows", validRows); // Ajouter uniquement les lignes valides
+            } catch (Exception e) {
+                fileResult.put("filename", file.getOriginalFilename());
+                fileResult.put("error", "Erreur lors du traitement : " + e.getMessage());
+            }
+
+            // Supprimer le fichier temporaire après traitement
+            tempFile.delete();
+
+            return fileResult;
+        } catch (IOException e) {
+            throw new RuntimeException("Erreur de traitement du fichier : " + e.getMessage());
         }
-
-        return fileResult;
     }
 
     private List<Map<String, String>> extractColumns(String[] lines) {
@@ -66,10 +73,10 @@ public class LectureOcrService {
             if (columns.length >= 5) {
                 Map<String, String> currentRow = new HashMap<>();
                 currentRow.put("Description", columns[0].trim());
-                currentRow.put("Unité", columns[1].trim());
-                currentRow.put("Qté", columns[2].trim());
-                currentRow.put("PU", columns[3].trim());
-                currentRow.put("Prix total", columns[4].trim());
+                currentRow.put("Unite", columns[1].trim());
+                currentRow.put("Quantite", columns[2].trim());
+                currentRow.put("PrixUnitaire", columns[3].trim());
+                currentRow.put("PrixTotal", columns[4].trim());
 
                 currentRow.putAll(parseDescription(columns[0].trim()));
 
@@ -89,9 +96,9 @@ public class LectureOcrService {
                     standaloneRow.put("Description", missingDescription);
                     standaloneRow.putAll(parseDescription(missingDescription));
                     standaloneRow.put("Unité", "");
-                    standaloneRow.put("Qté", "");
-                    standaloneRow.put("PU", "");
-                    standaloneRow.put("Prix total", "");
+                    standaloneRow.put("Quantite", "");
+                    standaloneRow.put("PrixUnitaire", "");
+                    standaloneRow.put("PrixTotal", "");
 
                     extractedData.add(standaloneRow);
                 }
@@ -146,26 +153,26 @@ public class LectureOcrService {
 
             for (String variante : variantes) {
                 if (cleanedDescription.toLowerCase().contains(variante.toLowerCase())) {
-                    result.put("Qualité", standardQualite);
+                    result.put("Qualite", standardQualite);
                     cleanedDescription = cleanedDescription.replaceAll("(?i)" + variante, "").trim();
                     break;
                 }
             }
-            if (result.containsKey("Qualité")) break;
+            if (result.containsKey("Qualite")) break;
         }
     
         // Étape 4 : Identifier et retirer le millésime ou indiquer "NM"
         boolean millesimeTrouve = false;
         for (String millesime : dictionary.getMillesimes()) {
             if (cleanedDescription.contains(millesime)) {
-                result.put("Millésime", millesime);
+                result.put("Millesime", millesime);
                 cleanedDescription = cleanedDescription.replaceAll("\\b" + millesime + "\\b", "").trim();
                 millesimeTrouve = true;
                 break;
             }
         }
         if (!millesimeTrouve) {
-            result.put("Millésime", "NM"); // Insérer "NM" si aucun millésime n'est trouvé
+            result.put("Millesime", "NM"); // Insérer "NM" si aucun millésime n'est trouvé
         }
         
         System.out.println("Description après retrait du millésime : " + cleanedDescription);
@@ -216,13 +223,13 @@ public class LectureOcrService {
         reordered.put("Description", row.getOrDefault("Description", ""));
         reordered.put("Domaine", row.getOrDefault("Domaine", ""));
         reordered.put("Appellation", row.getOrDefault("Appellation", ""));
-        reordered.put("Qualité", row.getOrDefault("Qualité", ""));
+        reordered.put("Qualite", row.getOrDefault("Qualite", ""));
         reordered.put("Cuvee", row.getOrDefault("Cuvee", ""));
-        reordered.put("Millésime", row.getOrDefault("Millésime", ""));
-        reordered.put("Unité", row.getOrDefault("Unité", ""));
-        reordered.put("Qté", row.getOrDefault("Qté", ""));
-        reordered.put("PU", row.getOrDefault("PU", ""));
-        reordered.put("Prix total", row.getOrDefault("Prix total", ""));
+        reordered.put("Millesime", row.getOrDefault("Millesime", ""));
+        reordered.put("Unite", row.getOrDefault("Unite", ""));
+        reordered.put("Quantite", row.getOrDefault("Quantite", ""));
+        reordered.put("PrixUnitaire", row.getOrDefault("PrixUnitaire", ""));
+        reordered.put("PrixTotal", row.getOrDefault("PrixTotal", ""));
         return reordered;
     }    
 
@@ -236,7 +243,7 @@ public class LectureOcrService {
         int count = 0;
         if (!row.getOrDefault("Domaine", "").isEmpty()) count++;
         if (!row.getOrDefault("Appellation", "").isEmpty()) count++;
-        if (!row.getOrDefault("Millésime", "").isEmpty()) count++;
+        if (!row.getOrDefault("Millesime", "").isEmpty()) count++;
 
         return count >= 2;
     }

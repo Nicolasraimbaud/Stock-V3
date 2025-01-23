@@ -18,6 +18,7 @@ public class WineService {
         this.wineRepository = wineRepository;
     }
 
+    /*  Méthode pour trier la liste de vin */
     public List<Wine> getAllWinesSorted() {
         // Récupérer tous les vins
         List<Wine> wines = wineRepository.findAll();
@@ -34,10 +35,17 @@ public class WineService {
         return sortedWines;
     }
 
+    /* Sauvegarder un seul vin */
     public Wine saveWine(Wine wine) {
         return wineRepository.save(wine);
     }
 
+    /* Sauvegarder plusieurs vins à la fois */
+    public List<Wine> saveAllWines(List<Wine> wines) {
+        return wineRepository.saveAll(wines);
+    }
+    
+    /* Supprimer un vin */
     public void deleteWine(Wine wine) {
         wineRepository.delete(wine);
     }
