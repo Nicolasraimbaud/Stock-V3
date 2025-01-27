@@ -49,8 +49,12 @@ import { Invoice } from '../../models/invoice'; // Modèle d'une facture
                   <td>
                     <span class="status-badge {{invoice.status}}">{{invoice.status}}</span>
                   </td>
-                  <td>
-                    <a [href]="'/invoices/' + invoice.pdfFileName" target="_blank">Voir PDF</a>
+                  <td class="pdf-cell">
+                    <a [href]="'/invoices/' + invoice.pdfFileName" 
+                       target="_blank" 
+                       class="pdf-button">
+                      PDF
+                    </a>
                   </td>
                 </tr>
               </tbody>
@@ -130,8 +134,8 @@ import { Invoice } from '../../models/invoice'; // Modèle d'une facture
       padding: 1rem;
       background: #8b0000;
       color: white;
-      font-weight: 500;
-      text-align: left;
+      font-weight: 600;
+      text-align: center;
       text-transform: uppercase;
       font-size: 0.75rem;
       letter-spacing: 0.05em;
@@ -143,6 +147,7 @@ import { Invoice } from '../../models/invoice'; // Modèle d'une facture
       border-bottom: 1px solid #f1f5f9;
       color: #1e293b;
       transition: all 0.2s ease;
+      text-align: center;
     }
 
     .invoice-table tr {
@@ -228,6 +233,37 @@ import { Invoice } from '../../models/invoice'; // Modèle d'une facture
     .empty-state p {
       font-size: 0.875rem;
       margin: 0;
+    }
+
+    .pdf-cell {
+      text-align: center;
+    }
+
+    .pdf-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 3rem;
+      padding: 0.4rem 0.75rem;
+      color: #8b0000;
+      text-decoration: none;
+      border-radius: 0.375rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      transition: all 0.2s ease;
+      background: rgba(139, 0, 0, 0.1);
+    }
+
+    .pdf-button:hover {
+      background: rgba(139, 0, 0, 0.15);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(139, 0, 0, 0.1), 0 2px 4px -1px rgba(139, 0, 0, 0.06);
+    }
+
+    .pdf-button:active {
+      transform: translateY(0);
+      box-shadow: none;
     }
 
     @media (max-width: 768px) {
