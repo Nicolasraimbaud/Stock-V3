@@ -1,0 +1,44 @@
+<div class="list-container">
+  <div class="search-bar">
+    <i class="fas fa-search search-icon"></i>
+    <input 
+      class="search-input" 
+      type="text" 
+      [(ngModel)]="searchTerm"
+      placeholder="Rechercher une facture...">
+  </div>
+  <div class="table-container">
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fournisseur</th>
+          <th>Email</th>
+          <th>Date</th>
+          <th>Prix Total</th>
+          <th>Statut</th>
+          <th>PDF</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let invoice of invoices">
+          <td>{{invoice.id}}</td>
+          <td>{{invoice.supplier}}</td>
+          <td>{{invoice.email}}</td>
+          <td>{{invoice.date}}</td>
+          <td>{{invoice.total}}</td>
+          <td>
+            <span class="status-badge {{invoice.status}}">{{invoice.status}}</span>
+          </td>
+          <td class="pdf-cell">
+            <a [href]="'/invoices/' + invoice.pdfFileName" 
+               target="_blank" 
+               class="pdf-button">
+              PDF
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

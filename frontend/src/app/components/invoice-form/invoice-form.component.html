@@ -1,0 +1,72 @@
+<div class="form-container">
+  <form [formGroup]="invoiceForm" (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="supplier">Fournisseur</label>
+        <input id="supplier" type="text" formControlName="supplier" class="form-control" placeholder="Nom du fournisseur" />
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" formControlName="email" class="form-control" placeholder="email@example.com" />
+      </div>
+
+      <div class="form-group file-upload">
+        <label for="file">
+          <i class="fas fa-file-pdf"></i>
+          Fichier PDF
+        </label>
+        <input id="file" type="file" (change)="onFileSelected($event)" class="form-control" accept=".pdf" />
+        <div *ngIf="selectedFile" class="file-name">{{ selectedFile.name }}</div>
+      </div>
+
+      <div *ngIf="isProcessing" class="progress-section">
+        <div class="steps">
+          <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1">
+            <div class="step-icon">
+              <i class="fas fa-sm" [class.fa-spinner]="currentStep === 1" [class.fa-spin]="currentStep === 1" 
+                 [class.fa-check]="currentStep > 1"></i>
+            </div>
+            <div class="step-content">
+              <div class="step-label">Chargement</div>
+              <div *ngIf="currentStep === 1" class="progress-bar">
+                <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-connector" [class.active]="currentStep >= 2"></div>
+
+          <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2">
+            <div class="step-icon">
+              <i class="fas fa-sm" [class.fa-spinner]="currentStep === 2" [class.fa-spin]="currentStep === 2"
+                 [class.fa-check]="currentStep > 2"></i>
+            </div>
+            <div class="step-content">
+              <div class="step-label">OCR</div>
+            </div>
+          </div>
+
+          <div class="step-connector" [class.active]="currentStep >= 3"></div>
+
+          <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3">
+            <div class="step-icon">
+              <i class="fas fa-sm" [class.fa-spinner]="currentStep === 3" [class.fa-spin]="currentStep === 3"
+                 [class.fa-check]="currentStep > 3"></i>
+            </div>
+            <div class="step-content">
+              <div class="step-label">Extraction</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="submit-button" [disabled]="!selectedFile || isProcessing">
+        <i class="fas" [class.fa-upload]="!isProcessing" [class.fa-spinner]="isProcessing" [class.fa-spin]="isProcessing"></i>
+        {{ isProcessing ? 'Traitement en cours...' : 'Analyser' }}
+      </button>
+    </div>
+  </form>
+</div>

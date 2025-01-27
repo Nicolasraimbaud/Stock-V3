@@ -1,0 +1,46 @@
+<div class="page-container">
+  <header class="page-header">
+    <h1>Gestion des Factures</h1>
+    <div class="header-actions">
+      <a class="action-button" [routerLink]="['/wines']">
+        <i class="fas fa-wine-bottle"></i>
+        Liste des Vins
+      </a>
+    </div>
+  </header>
+
+  <div class="main-content">
+    <div class="content-grid">
+      <div class="section-card list-section">
+        <div class="section-header">
+          <h2>Liste des Factures</h2>
+          <div class="section-actions">
+            <button class="section-button">
+              <i class="fas fa-filter"></i>
+              Filtrer
+            </button>
+            <button class="section-button">
+              <i class="fas fa-sort"></i>
+              Trier
+            </button>
+          </div>
+        </div>
+        <app-invoice-list></app-invoice-list>
+      </div>
+
+      <div class="section-card form-section">
+        <div class="section-header">
+          <h2>Nouvelle Facture</h2>
+        </div>
+        <app-invoice-form (ocrResults)="handleOcrResults($event)"></app-invoice-form>
+      </div>
+
+      <div class="section-card preview-section">
+        <div class="section-header">
+          <h2>Prévisualisation</h2>
+        </div>
+        <app-invoice-preview [ocrResults]="ocrData"></app-invoice-preview>
+      </div>
+    </div>
+  </div>
+</div>
