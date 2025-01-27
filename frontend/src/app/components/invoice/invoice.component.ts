@@ -17,10 +17,6 @@ import { RouterModule } from '@angular/router';
             <i class="fas fa-wine-bottle"></i>
             Liste des Vins
           </a>
-          <button class="action-button" (click)="printInvoiceList()">
-            <i class="fas fa-print"></i>
-            Imprimer
-          </button>
         </div>
       </header>
 
@@ -239,9 +235,5 @@ export class InvoiceComponent {
 
   handleOcrResults(results: any): void {
     this.ocrData = results;
-  }
-
-  printInvoiceList() {
-    window.print();
   }
 }

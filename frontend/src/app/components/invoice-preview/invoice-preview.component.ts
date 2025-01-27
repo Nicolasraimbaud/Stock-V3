@@ -14,28 +14,28 @@ import { WineService } from '../../services/wine.service';
         <table class="result-table">
           <thead>
             <tr>
-              <th>Domaine</th>
-              <th>Appellation</th>
-              <th>Qualité</th>
-              <th>Cuvée</th>
-              <th>Millésime</th>
-              <th>Unité</th>
-              <th>Quantité</th>
-              <th>Prix Unitaire</th>
-              <th>Prix Total</th>
+              <th class="col-domaine">Domaine</th>
+              <th class="col-appellation">Appellation</th>
+              <th class="col-qualite">Qualité</th>
+              <th class="col-cuvee">Cuvée</th>
+              <th class="col-millesime">Millésime</th>
+              <th class="col-unite">Unité</th>
+              <th class="col-quantite">Quantité</th>
+              <th class="col-prix-unitaire">Prix Unitaire</th>
+              <th class="col-prix-total">Prix Total</th>
             </tr>
           </thead>
           <tbody *ngIf="ocrResults && ocrResults.rows">
             <tr *ngFor="let row of ocrResults.rows; let i = index">
-              <td><input [(ngModel)]="row.Domaine" class="editable-field" /></td>
-              <td><input [(ngModel)]="row.Appellation" class="editable-field" /></td>
-              <td><input [(ngModel)]="row.Qualite" class="editable-field" /></td>
-              <td><input [(ngModel)]="row.Cuvee" class="editable-field" /></td>
-              <td><input [(ngModel)]="row.Millesime" class="editable-field numeric-field" /></td>
-              <td><input [(ngModel)]="row.Unite" class="editable-field numeric-field" /></td>
-              <td><input [(ngModel)]="row.Quantite" class="editable-field numeric-field" /></td>
-              <td><input [(ngModel)]="row.PrixUnitaire" class="editable-field numeric-field" /></td>
-              <td><input [(ngModel)]="row.PrixTotal" class="editable-field numeric-field" /></td>
+              <td class="col-domaine"><input [(ngModel)]="row.Domaine" class="editable-field" /></td>
+              <td class="col-appellation"><input [(ngModel)]="row.Appellation" class="editable-field" /></td>
+              <td class="col-qualite"><input [(ngModel)]="row.Qualite" class="editable-field" /></td>
+              <td class="col-cuvee"><input [(ngModel)]="row.Cuvee" class="editable-field" /></td>
+              <td class="col-millesime"><input [(ngModel)]="row.Millesime" class="editable-field numeric-field" /></td>
+              <td class="col-unite"><input [(ngModel)]="row.Unite" class="editable-field numeric-field" /></td>
+              <td class="col-quantite"><input [(ngModel)]="row.Quantite" class="editable-field numeric-field" /></td>
+              <td class="prix-cell col-prix-unitaire"><input [(ngModel)]="row.PrixUnitaire" class="editable-field numeric-field" /></td>
+              <td class="prix-cell col-prix-total"><input [(ngModel)]="row.PrixTotal" class="editable-field numeric-field" /></td>
             </tr>
           </tbody>
         </table>
@@ -125,6 +125,21 @@ import { WineService } from '../../services/wine.service';
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
+
+    .prix-cell {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .col-domaine { width: 15%; }
+    .col-appellation { width: 15%; }
+    .col-qualite { width: 10%; }
+    .col-cuvee { width: 20%; }  /* Plus large pour la cuvée */
+    .col-millesime { width: 8%; }  /* Plus petit */
+    .col-unite { width: 7%; }      /* Plus petit */
+    .col-quantite { width: 8%; }   /* Plus petit */
+    .col-prix-unitaire { width: 8%; } /* Plus petit */
+    .col-prix-total { width: 9%; }    /* Plus petit */
 
     .actions {
       display: flex;
