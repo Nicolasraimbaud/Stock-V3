@@ -17,69 +17,241 @@ import { Invoice } from '../../models/invoice'; // Modèle d'une facture
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule, RouterModule, FormsModule],
   template: `
-        <table class="invoice-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Fournisseur</th>
-              <th>Email</th>
-              <th>Date</th>
-              <th>Prix Total</th>
-              <th>Statut</th>
-              <th>PDF</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let invoice of invoices">
-              <td>{{invoice.id}}</td>
-              <td>{{invoice.supplier}}</td>
-              <td>{{invoice.email}}</td>
-              <td>{{invoice.date}}</td>
-              <td>{{invoice.total}}</td>
-              <td>{{invoice.status}}</td>
-              <td>
-                <a [href]="'/invoices/' + invoice.pdfFileName" target="_blank">Voir PDF</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>      
+        <div class="list-container">
+          <div class="search-bar">
+            <i class="fas fa-search search-icon"></i>
+            <input 
+              class="search-input" 
+              type="text" 
+              [(ngModel)]="searchTerm"
+              placeholder="Rechercher une facture...">
+          </div>
+          <div class="table-container">
+            <table class="invoice-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Fournisseur</th>
+                  <th>Email</th>
+                  <th>Date</th>
+                  <th>Prix Total</th>
+                  <th>Statut</th>
+                  <th>PDF</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let invoice of invoices">
+                  <td>{{invoice.id}}</td>
+                  <td>{{invoice.supplier}}</td>
+                  <td>{{invoice.email}}</td>
+                  <td>{{invoice.date}}</td>
+                  <td>{{invoice.total}}</td>
+                  <td>
+                    <span class="status-badge {{invoice.status}}">{{invoice.status}}</span>
+                  </td>
+                  <td>
+                    <a [href]="'/invoices/' + invoice.pdfFileName" target="_blank">Voir PDF</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>      
   `,
   styles: [`
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      height: 100%;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      overflow: hidden;
+      padding: 1.5rem;
+    }
 
-    /* Table */
+    .search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.75rem;
+      transition: all 0.2s ease;
+    }
+
+    .search-bar:focus-within {
+      border-color: #8b0000;
+      box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.1);
+    }
+
+    .search-icon {
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 0.875rem;
+      color: #1e293b;
+      padding: 0.25rem;
+    }
+
+    .search-input:focus {
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .table-container {
+      flex: 1;
+      overflow: auto;
+      border-radius: 0.75rem;
+      border: 1px solid #e5e7eb;
+    }
+
     .invoice-table {
       width: 100%;
-      border-collapse: collapse;
-      background-color: #fff;
-      border-radius: 8px;
-      overflow: hidden;
-      user-select: none;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 0.875rem;
     }
 
-    /* Table Headers */
     .invoice-table th {
-      background-color: #8b0000; /* Bordeaux */
+      position: sticky;
+      top: 0;
+      padding: 1rem;
+      background: #8b0000;
       color: white;
+      font-weight: 500;
       text-align: left;
-      padding: 12px;
-      user-select: none;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid #7a001f;
     }
 
-    /* Table Rows */
     .invoice-table td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-      user-select: none;
+      padding: 1rem;
+      border-bottom: 1px solid #f1f5f9;
+      color: #1e293b;
+      transition: all 0.2s ease;
     }
 
-    /* Alternating Row Colors */
-    .invoice-table tr:nth-child(even) {
-      background-color: #f2f2f2;
+    .invoice-table tr {
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
 
-    .invoice-table tr:hover {
-      background-color: #fdecea; /* Light Bordeaux Tint */
+    .invoice-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .invoice-table tr.selected td {
+      background: #fff1f1;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.375rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: capitalize;
+    }
+
+    .status-badge.en_cours {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-badge.a_regler {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-badge.termine {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .action-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-button:hover {
+      background: #f1f5f9;
+      color: #1e293b;
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .empty-state p {
+      font-size: 0.875rem;
+      margin: 0;
+    }
+
+    @media (max-width: 768px) {
+      .list-container {
+        padding: 1rem;
+      }
+
+      .search-bar {
+        padding: 0.5rem;
+      }
+
+      .invoice-table th,
+      .invoice-table td {
+        padding: 0.75rem 0.5rem;
+      }
+
+      .status-badge {
+        padding: 0.25rem 0.5rem;
+      }
+
+      .action-button {
+        width: 1.75rem;
+        height: 1.75rem;
+      }
     }
   `],
   providers: [CurrencyPipe],
@@ -93,6 +265,7 @@ export class InvoiceListComponent implements OnInit {
   invoiceForm: FormGroup;
   selectedFile: File | null = null;
   results: any[] = []; // Stocke les résultats OCR
+  searchTerm: string = ''; // Nouveau champ pour stocker la valeur de recherche
 
   constructor(
     private fb: FormBuilder,

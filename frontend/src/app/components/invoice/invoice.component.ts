@@ -59,8 +59,8 @@ import { RouterModule } from '@angular/router';
   styles: [`
     .page-container {
       min-height: 100vh;
-      padding: 1.5rem;
-      background-color: #f8fafc;
+      padding: 2rem;
+      background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
     }
 
     .page-header {
@@ -68,43 +68,55 @@ import { RouterModule } from '@angular/router';
       justify-content: space-between;
       align-items: center;
       margin-bottom: 2rem;
-      padding: 1.5rem;
+      padding: 1.5rem 2rem;
       background: white;
-      border-radius: 0.75rem;
-      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      backdrop-filter: blur(8px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .page-header:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
 
     h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #1e293b;
+      font-size: 1.875rem;
+      font-weight: 700;
+      background: linear-gradient(45deg, #8b0000, #b91c1c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.025em;
       margin: 0;
     }
 
     .header-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: 1rem;
     }
 
     .action-button {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.25rem;
+      padding: 0.75rem 1.5rem;
       background: #8b0000;
       color: white;
       border: none;
-      border-radius: 0.5rem;
+      border-radius: 0.75rem;
       font-size: 0.875rem;
       font-weight: 500;
       text-decoration: none;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgb(139 0 0 / 0.2);
     }
 
     .action-button:hover {
       background: #7a001f;
       transform: translateY(-1px);
+      box-shadow: 0 4px 6px rgb(139 0 0 / 0.3);
     }
 
     .action-button:active {
@@ -116,35 +128,43 @@ import { RouterModule } from '@angular/router';
     }
 
     .main-content {
-      display: grid;
-      gap: 1.5rem;
+      margin: 0 auto;
+      max-width: 1800px;
     }
 
     .content-grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
-      gap: 1.5rem;
+      gap: 2rem;
     }
 
     .section-card {
       background: white;
-      border-radius: 0.75rem;
-      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    .section-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     }
 
     .section-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.25rem 1.5rem;
+      padding: 1.5rem 2rem;
       border-bottom: 1px solid #e5e7eb;
+      background: rgba(255, 255, 255, 0.9);
     }
 
     .section-header h2 {
-      font-size: 1.125rem;
+      font-size: 1.25rem;
       font-weight: 600;
       color: #1e293b;
       margin: 0;
@@ -152,39 +172,61 @@ import { RouterModule } from '@angular/router';
 
     .section-actions {
       display: flex;
-      gap: 0.5rem;
+      gap: 0.75rem;
     }
 
     .section-button {
       display: inline-flex;
       align-items: center;
-      gap: 0.375rem;
-      padding: 0.5rem 0.75rem;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
       background: #f8fafc;
       color: #475569;
       border: 1px solid #e5e7eb;
-      border-radius: 0.375rem;
+      border-radius: 0.5rem;
       font-size: 0.875rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
     }
 
     .section-button:hover {
       background: #f1f5f9;
       border-color: #cbd5e1;
       color: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    .section-button:active {
+      transform: translateY(0);
+    }
+
+    .section-button i {
+      font-size: 0.875rem;
     }
 
     .list-section {
-      grid-column: span 6;
+      grid-column: span 4;
     }
 
     .form-section {
-      grid-column: span 6;
+      grid-column: span 4;
     }
 
     .preview-section {
-      grid-column: span 12;
+      grid-column: span 4;
+    }
+
+    @media (max-width: 1536px) {
+      .list-section {
+        grid-column: span 6;
+      }
+      .form-section {
+        grid-column: span 6;
+      }
+      .preview-section {
+        grid-column: span 12;
+      }
     }
 
     @media (max-width: 1280px) {
@@ -204,7 +246,7 @@ import { RouterModule } from '@angular/router';
         flex-direction: column;
         gap: 1rem;
         align-items: stretch;
-        padding: 1rem;
+        padding: 1.25rem;
       }
 
       .header-actions {
@@ -221,7 +263,7 @@ import { RouterModule } from '@angular/router';
       }
 
       .section-header {
-        padding: 1rem;
+        padding: 1.25rem;
       }
 
       .section-actions {
