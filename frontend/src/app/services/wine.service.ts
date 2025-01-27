@@ -16,26 +16,19 @@ export class WineService {
     return this.http.get<Wine[]>(this.apiUrl);
   }
 
-  private addWine(wine: Wine): Observable<Wine> {
-    return this.http.post<Wine>(this.apiUrl, wine);
-  }
-
-  private updateExcel(wine: Wine): Observable<any> {
-    return this.http.post(`${this.excelUrl}/export`, wine);
-  }
-
-  addWineAndUpdateExcel(wine: Wine): Observable<Wine> {
-    return this.addWine(wine).pipe(
-      switchMap((savedWine: Wine) => this.updateExcel(savedWine)),
-      map(() => wine),
-      catchError((error: any) => {
-        console.error('Error:', error);
-        throw error;
-      })
-    );
-  }
-
+  /* Import all excel data to the database */
   importExcelData(): Observable<any> {
     return this.http.get(`${this.excelUrl}/import`);
+  }
+
+  /* Mise à jour du fichier Excel avec plusieurs vins */
+  updateExcelList(wines: Wine[]): Observable<any> {
+    return this.http.post(`${this.excelUrl}/export-batch`, wines).pipe(
+    map(() => wines),
+    catchError((error: any) => {
+        console.error('Error updating Excel:', error);
+        throw error;
+    })
+    );
   }
 }

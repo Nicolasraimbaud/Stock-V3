@@ -17,10 +17,10 @@ public class Wine {
     private String appellation;
     private String region;
     private String country;
-    private double pricetobuy;
-    private double pricetosell;
-    private double cost;
-    private int quantity;
+    private Double pricetobuy;
+    private Double pricetosell;
+    private Double cost;
+    private Integer quantity;
     private LocalDate updated;
     private String supplier;
 
@@ -81,19 +81,19 @@ public class Wine {
         this.country = country;
     }
 
-    public double getPricetobuy() {
+    public Double getPricetobuy() {
         return pricetobuy;
     }
 
-    public void setPricetobuy(double pricetobuy) {
+    public void setPricetobuy(Double pricetobuy) {
         this.pricetobuy = pricetobuy;
     }
 
-    public double getPricetosell() {
+    public Double getPricetosell() {
         return pricetosell;
     }
 
-    public void setPricetosell(double pricetosell) {
+    public void setPricetosell(Double pricetosell) {
         this.pricetosell = pricetosell;
     }
 
@@ -105,11 +105,11 @@ public class Wine {
         this.cost = cost;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 

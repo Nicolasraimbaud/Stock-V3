@@ -1,17 +1,5 @@
 package com.example.backend.service;
 
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Service;
-
-import com.example.backend.model.Wine;
-import com.example.backend.repository.WineRepository;
-
-import org.slf4j.Logger;
-
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -23,6 +11,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+
+import com.example.backend.model.Wine;
+import com.example.backend.repository.WineRepository;
 
 @Service
 public class ExcelService {
@@ -204,32 +207,59 @@ public class ExcelService {
         return data;
     }
 
-    public void updateExcelFile(Wine newWine) {
+    public void updateExcelFileBatch(List<Wine> wines) {
         try (InputStream inputStream = new ClassPathResource("data.xlsx").getInputStream();
-            Workbook workbook = new XSSFWorkbook(inputStream)) {
+             Workbook workbook = new XSSFWorkbook(inputStream)) {
             
             Sheet sheet = workbook.getSheetAt(0);
             int lastRowNum = sheet.getLastRowNum();
-                        
-            // Add new row after existing data
-            Row row = sheet.createRow(lastRowNum + 1);
-            row.createCell(0).setCellValue(newWine.getMillesime());
-            row.createCell(1).setCellValue(newWine.getCuvee());
-            row.createCell(2).setCellValue(newWine.getDomaine());
-            row.createCell(3).setCellValue(newWine.getAppellation());
-            row.createCell(4).setCellValue(newWine.getPricetosell());
-            row.createCell(5).setCellValue(newWine.getQuantity());
             
-            // Write to existing Excel file
+            for (Wine wine : wines) {
+                if (wine.getMillesime() == null || 
+                    wine.getCuvee() == null || 
+                    wine.getDomaine() == null || 
+                    wine.getAppellation() == null || 
+                    wine.getPricetobuy() == null || 
+                    wine.getUpdated() == null || 
+                    wine.getQuantity() == null) {
+                        logger.error("Wine data contains null values: Millesime={}, Cuvee={}, Domaine={}, Appellation={}, Pricetosell={}, Quantity={}",
+                        wine.getMillesime(), wine.getCuvee(), wine.getDomaine(), 
+                        wine.getAppellation(), wine.getPricetobuy(), wine.getQuantity());
+                    continue;
+                }
+                
+                if (wine.getPricetobuy() == null) {
+                    logger.error("Price to buy is null for wine: {}", wine);
+                    continue;
+                }
+
+                int quantity = (wine.getQuantity() != null) ? wine.getQuantity() : 0;
+                if (quantity == 0) {
+                    logger.warn("Quantity is zero for wine: {}", wine);
+                }
+    
+                double priceToBuy = (wine.getPricetobuy() != null) ? wine.getPricetobuy() : 0.0;
+    
+                Row row = sheet.createRow(++lastRowNum);
+                row.createCell(0).setCellValue(wine.getMillesime());
+                row.createCell(1).setCellValue(wine.getCuvee());
+                row.createCell(2).setCellValue(wine.getDomaine());
+                row.createCell(3).setCellValue(wine.getAppellation());
+                row.createCell(6).setCellValue(priceToBuy);
+                row.createCell(9).setCellValue(wine.getQuantity());
+                row.createCell(10).setCellValue(wine.getUpdated());
+            }
+            
             try (FileOutputStream fileOut = new FileOutputStream("src/main/resources/data.xlsx")) {
                 workbook.write(fileOut);
-                logger.info("Excel file updated with new wine: {} - {}", newWine.getDomaine(), newWine.getCuvee());
+                logger.info("Excel file updated successfully with new wines");
             }
         } catch (Exception e) {
             logger.error("Failed to update Excel file", e);
             throw new RuntimeException("Error updating Excel file", e);
         }
-    }
+    }  
+    
 
     public void saveWine(Wine wine) {
         wineRepository.save(wine);

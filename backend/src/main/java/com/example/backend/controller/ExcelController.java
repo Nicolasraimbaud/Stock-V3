@@ -46,6 +46,7 @@ public class ExcelController {
             System.out.println("GET /api/excel/import called");
             List<Map<String, String>> excelData = excelService.readExcelFile();
             System.out.println("Excel data read: " + excelData);
+            
             List<Wine> wines = excelService.processExcelAndSaveToDb();
             System.out.println("Imported wines: " + wines);
             return ResponseEntity.ok(wines);
@@ -56,17 +57,17 @@ public class ExcelController {
         }
     }
 
-    /*We export the data from add component to the excel file */
-    @PostMapping("/export")
-    public ResponseEntity<String> exportToExcel(@RequestBody Wine newWine) {
+    /*We export the wines to the excel file */
+    @PostMapping("/export-batch")
+    public ResponseEntity<String> exportToExcel(@RequestBody List<Wine> wines) {
         try {
-            System.out.println("POST /api/excel/export called");
-            excelService.updateExcelFile(newWine);
-            return ResponseEntity.ok("Wine exported successfully");
+            System.out.println("POST /api/excel/export-batch called");
+            excelService.updateExcelFileBatch(wines);
+            return ResponseEntity.ok("Wines exported successfully");
         } catch (Exception e) {
-            System.err.println("Error exporting wine: " + e.getMessage());
+            System.err.println("Error exporting wines: " + e.getMessage());
             return ResponseEntity.internalServerError()
-                    .body("Failed to export wine: " + e.getMessage());
+                    .body("Failed to export wines: " + e.getMessage());
         }
     }
 }

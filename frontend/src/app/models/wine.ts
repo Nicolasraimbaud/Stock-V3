@@ -4,12 +4,14 @@ export interface Wine {
     cuvee: string;
     domaine: string;
     appellation: string;
-    region: string;
-    country: string;
     pricetobuy: number;
-    pricetosell: number;
-    cost: number;
+    unite: string;
     quantity: number;
     updated: Date;
     supplier: string;
+    country: string;
+    region: string;
+    cost: number;
+    pricetosell: number;
+
 }
