@@ -60,7 +60,7 @@ import { WineService } from '../../services/wine.service';
                 <td>{{wine.country}}</td>
                 <td class="price">{{wine.pricetobuy | currency:'EUR':'symbol':'1.2-2'}}</td>
                 <td class="price">{{wine.pricetosell | currency:'EUR':'symbol':'1.2-2'}}</td>
-                <td class="price">{{wine.cost}}</td>
+                <td class="price">{{wine.cost | number: '1.3-3'}}</td>
                 <td class="quantity">{{wine.quantity}}</td>
                 <td>{{wine.updated | date:'dd/MM/yyyy'}}</td>
                 <td>{{wine.id}}</td>
