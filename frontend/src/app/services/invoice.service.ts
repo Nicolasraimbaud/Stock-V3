@@ -33,4 +33,8 @@ export class InvoiceService {
   processOcrFile(formData: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/process-ocr`, formData);
   }
+
+  updateInvoiceStatus(invoiceId: number, status: string): Observable<any> {
+    return this.http.patch(`${this.baseUrl}/${invoiceId}/status`, { status });
+  }
 }

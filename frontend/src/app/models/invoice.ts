@@ -7,6 +7,7 @@ export interface Invoice {
     status: string;            // Statut de la facture
     pdfFileName: string;       // Nom du fichier PDF lié
     rows: OcrRow[];            // Lignes OCR extraites
+    saving?: boolean;          // Indicateur de sauvegarde en cours
 }
 
 // Modèle pour une ligne OCR

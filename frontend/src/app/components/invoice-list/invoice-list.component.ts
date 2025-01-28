@@ -29,6 +29,12 @@ export class InvoiceListComponent implements OnInit {
   results: any[] = []; // Stocke les résultats OCR
   searchTerm: string = ''; // Nouveau champ pour stocker la valeur de recherche
 
+  statusOptions = [
+    { value: 'en_cours', label: 'En Cours' },
+    { value: 'a_regler', label: 'À Régler' },
+    { value: 'termine', label: 'Terminé' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
@@ -128,6 +134,32 @@ export class InvoiceListComponent implements OnInit {
       error: (error) => {
         console.error('Erreur lors de l\'enregistrement des données :', error);
       },
+    });
+  }
+
+  updateInvoiceStatus(invoice: Invoice, newStatus: string): void {
+    if (invoice.id === undefined) {
+      console.error('Cannot update status: Invoice ID is undefined');
+      return;
+    }
+    
+    // Sauvegarder l'ancien statut en cas d'erreur
+    const oldStatus = invoice.status;
+    
+    // Mettre à jour immédiatement l'UI
+    invoice.status = newStatus;
+    invoice.saving = true;  // Indicateur de sauvegarde en cours
+    
+    this.invoiceService.updateInvoiceStatus(invoice.id, newStatus).subscribe({
+      next: () => {
+        console.log('Statut mis à jour avec succès');
+        invoice.saving = false;  // Fin de la sauvegarde
+      },
+      error: (error) => {
+        console.error('Erreur lors de la mise à jour du statut:', error);
+        invoice.status = oldStatus;  // Restaurer l'ancien statut en cas d'erreur
+        invoice.saving = false;
+      }
     });
   }
 }

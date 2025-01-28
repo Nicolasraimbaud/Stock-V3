@@ -28,7 +28,21 @@
           <td>{{invoice.date}}</td>
           <td>{{invoice.total}}</td>
           <td>
-            <span class="status-badge {{invoice.status}}">{{invoice.status}}</span>
+            <div class="status-container">
+              <select 
+                [ngModel]="invoice.status"
+                (ngModelChange)="updateInvoiceStatus(invoice, $event)"
+                class="status-select"
+                [class.saving]="invoice['saving']">
+                <option *ngFor="let option of statusOptions" [value]="option.value">
+                  {{option.label}}
+                </option>
+              </select>
+              <span class="status-badge {{invoice.status}}">{{invoice.status}}</span>
+              <span *ngIf="invoice['saving']" class="saving-indicator">
+                <i class="fas fa-spinner fa-spin"></i>
+              </span>
+            </div>
           </td>
           <td class="pdf-cell">
             <a [href]="'/invoices/' + invoice.pdfFileName" 
