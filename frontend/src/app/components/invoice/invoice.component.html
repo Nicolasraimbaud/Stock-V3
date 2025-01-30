@@ -35,9 +35,15 @@
         <app-invoice-form (ocrResults)="handleOcrResults($event)"></app-invoice-form>
       </div>
 
-      <div class="section-card preview-section">
+      <div class="section-card preview-section" (click)="validateChanges()">
         <div class="section-header">
           <h2>Prévisualisation</h2>
+          <div class="section-actions">
+            <button class="validate-button">
+              <i class="fas fa-check"></i>
+              Valider
+            </button>
+          </div>
         </div>
         <app-invoice-preview [ocrResults]="ocrData"></app-invoice-preview>
       </div>
