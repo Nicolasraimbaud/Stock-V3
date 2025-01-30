@@ -6,12 +6,12 @@ import com.example.backend.service.InvoiceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/invoices")
@@ -33,16 +33,12 @@ public class InvoiceController {
         @RequestParam("file") MultipartFile file
     ) {
         try {
-            // Appeler le service pour gérer le fichier et enregistrer les données
             invoiceService.saveInvoice(supplier, email, date, total, status, file);
-
-            return ResponseEntity.ok("Invoice ajoutée avec succès");
+            return ResponseEntity.ok("{ \"message\": \"Invoice ajoutée avec succès\" }");
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur lors de la gestion du fichier");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{ \"error\": \"" + e.getMessage() + "\" }");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erreur inattendue : " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("{ \"error\": \"Erreur inattendue : " + e.getMessage() + "\" }");
         }
     }
 
@@ -53,13 +49,23 @@ public class InvoiceController {
 
     @PostMapping("/save")
     public ResponseEntity<String> saveUpdatedRows(@RequestBody List<Map<String, Object>> rows) {
-        // Logique pour sauvegarder les données mises à jour dans la base de données
         System.out.println("Données reçues : " + rows);
-
-        // Sauvegarde dans la base de données (à implémenter)
-        // Exemple : invoiceService.saveRows(rows);
-
-        return ResponseEntity.ok("Données enregistrées avec succès");
+        invoiceService.saveRows(rows);
+        return ResponseEntity.ok("{ \"message\": \"Données enregistrées avec succès\" }");
     }
-    
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> updateInvoiceStatus(
+        @PathVariable Long id,
+        @RequestBody String status
+    ) {
+        invoiceService.updateInvoiceStatus(id, status);
+        return ResponseEntity.ok("{ \"message\": \"Statut mis à jour avec succès\" }");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteInvoice(@PathVariable Long id) {
+        invoiceService.deleteInvoice(id);
+        return ResponseEntity.ok("{ \"message\": \"Facture supprimée avec succès\" }");
+    }
 }

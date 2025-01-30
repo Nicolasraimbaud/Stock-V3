@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class InvoiceService {
@@ -23,36 +24,49 @@ public class InvoiceService {
     }
 
     public void saveInvoice(String supplier, String email, LocalDate date, double total, String status, MultipartFile file) throws IOException {
-        // Sauvegarde du fichier PDF
         String uploadDir = "src/main/resources/uploads/";
         Path uploadPath = Paths.get(uploadDir);
-    
-        // Crée le dossier 'uploads' s'il n'existe pas
+
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-    
-        // Génère un nom de fichier unique pour éviter les conflits
+
         String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
         Path filePath = uploadPath.resolve(fileName);
-    
-        // Copie le fichier dans le répertoire 'uploads'
+
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-    
-        // Sauvegarde de l'objet Invoice dans la base de données
+
         Invoice invoice = new Invoice();
         invoice.setSupplier(supplier);
         invoice.setEmail(email);
         invoice.setDate(date);
         invoice.setTotal(total);
         invoice.setStatus(status);
-        invoice.setPdfFileName(fileName); // Enregistre le nom du fichier
-    
+        invoice.setPdfFileName(fileName);
+
         invoiceRepository.save(invoice);
     }
-    
 
     public List<Invoice> getAllInvoices() {
         return invoiceRepository.findAll();
+    }
+
+    public void saveRows(List<Map<String, Object>> rows) {
+        // Implémentation de la sauvegarde des données mises à jour
+        for (Map<String, Object> row : rows) {
+            Invoice invoice = invoiceRepository.findById(Long.parseLong(row.get("id").toString())).orElseThrow();
+            invoice.setStatus(row.get("status").toString());
+            invoiceRepository.save(invoice);
+        }
+    }
+
+    public void updateInvoiceStatus(Long id, String status) {
+        Invoice invoice = invoiceRepository.findById(id).orElseThrow();
+        invoice.setStatus(status);
+        invoiceRepository.save(invoice);
+    }
+
+    public void deleteInvoice(Long id) {
+        invoiceRepository.deleteById(id);
     }
 }

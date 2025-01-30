@@ -18,6 +18,7 @@
           <th>Prix Total</th>
           <th>Statut</th>
           <th>PDF</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -50,6 +51,14 @@
                class="pdf-button">
               PDF
             </a>
+          </td>
+          <td class="action-cell">
+            <button 
+              class="delete-button"
+              *ngIf="invoice.id"
+              (click)="deleteInvoice(invoice.id)">
+              Supprimer
+            </button>
           </td>
         </tr>
       </tbody>

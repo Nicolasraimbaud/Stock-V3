@@ -37,4 +37,8 @@ export class InvoiceService {
   updateInvoiceStatus(invoiceId: number, status: string): Observable<any> {
     return this.http.patch(`${this.baseUrl}/${invoiceId}/status`, { status });
   }
+
+  deleteInvoice(id: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
 }

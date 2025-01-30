@@ -2,15 +2,13 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs/operators';
-
 import { CurrencyPipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
-
-import { InvoiceService } from '../../services/invoice.service'; // Service pour gérer les factures
-import { Invoice } from '../../models/invoice'; // Modèle d'une facture
+import { InvoiceService } from '../../services/invoice.service';
+import { Invoice } from '../../models/invoice';
 
 @Component({
   selector: 'app-invoice-list',
@@ -21,14 +19,12 @@ import { Invoice } from '../../models/invoice'; // Modèle d'une facture
 })
 export class InvoiceListComponent implements OnInit {
   @ViewChild('addInvoiceModal') addInvoiceModal: any;
-  @ViewChild('ocrResultsModal') ocrResultsModal: any; // Nouveau modal pour afficher les résultats OCR
-
+  @ViewChild('ocrResultsModal') ocrResultsModal: any;
   invoices: Invoice[] = [];
   invoiceForm: FormGroup;
   selectedFile: File | null = null;
-  results: any[] = []; // Stocke les résultats OCR
-  searchTerm: string = ''; // Nouveau champ pour stocker la valeur de recherche
-
+  results: any[] = [];
+  searchTerm: string = '';
   statusOptions = [
     { value: 'en_cours', label: 'En Cours' },
     { value: 'a_regler', label: 'À Régler' },
@@ -52,22 +48,20 @@ export class InvoiceListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Recharge les données chaque fois que vous naviguez sur la page
     this.route.url.subscribe(() => {
-      this.loadInvoices(); // Recharger les factures
+      this.loadInvoices();
     });
   }
 
-  // Charger la liste des factures
   loadInvoices(): void {
     console.log('Début du chargement des factures...');
     this.invoiceService.getInvoices().subscribe({
       next: (data) => {
-        console.log('Factures reçues :', data); // Vérifiez les données reçues
-        this.invoices = data; // Charge les factures dans la liste
+        console.log('Factures reçues :', data);
+        this.invoices = data;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des factures :', error); // Vérifiez les erreurs
+        console.error('Erreur lors du chargement des factures :', error);
       },
       complete: () => {
         console.log('Chargement des factures terminé');
@@ -75,24 +69,21 @@ export class InvoiceListComponent implements OnInit {
     });
   }
 
-  // Ouvrir la modale
   openAddInvoiceModal(): void {
     this.dialog.open(this.addInvoiceModal);
   }
 
   openOcrResultsModal(): void {
     this.dialog.open(this.ocrResultsModal, {
-      width: '80%', // Ajustez la taille si nécessaire
-      data: { results: this.results }, // Passez les données au modal
+      width: '80%',
+      data: { results: this.results },
     });
   }
 
-  // Sélectionner un fichier PDF
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
   }
 
-  // Soumettre le formulaire
   onSubmit(): void {
     if (!this.selectedFile) {
       console.error('Aucun fichier sélectionné');
@@ -110,12 +101,8 @@ export class InvoiceListComponent implements OnInit {
     this.invoiceService.processOcrFile(formData).subscribe(
       (response) => {
         console.log('Résultats OCR obtenus avec succès', response);
-        this.results = response.rows; // Stocke les lignes OCR extraites
-
-        // Fermer le premier modal
+        this.results = response.rows;
         this.dialog.closeAll();
-
-        // Ouvrir le second modal avec les résultats OCR
         this.openOcrResultsModal();
       },
       (error) => {
@@ -128,8 +115,8 @@ export class InvoiceListComponent implements OnInit {
     this.invoiceService.saveUpdatedRows(this.results).subscribe({
       next: () => {
         console.log('Données enregistrées avec succès');
-        this.results = []; // Réinitialiser les résultats
-        this.loadInvoices(); // Recharger la liste des factures
+        this.results = [];
+        this.loadInvoices();
       },
       error: (error) => {
         console.error('Erreur lors de l\'enregistrement des données :', error);
@@ -142,23 +129,32 @@ export class InvoiceListComponent implements OnInit {
       console.error('Cannot update status: Invoice ID is undefined');
       return;
     }
-    
-    // Sauvegarder l'ancien statut en cas d'erreur
+
     const oldStatus = invoice.status;
-    
-    // Mettre à jour immédiatement l'UI
     invoice.status = newStatus;
-    invoice.saving = true;  // Indicateur de sauvegarde en cours
-    
+    invoice.saving = true;
+
     this.invoiceService.updateInvoiceStatus(invoice.id, newStatus).subscribe({
       next: () => {
         console.log('Statut mis à jour avec succès');
-        invoice.saving = false;  // Fin de la sauvegarde
+        invoice.saving = false;
       },
       error: (error) => {
         console.error('Erreur lors de la mise à jour du statut:', error);
-        invoice.status = oldStatus;  // Restaurer l'ancien statut en cas d'erreur
+        invoice.status = oldStatus;
         invoice.saving = false;
+      }
+    });
+  }
+
+  deleteInvoice(invoiceId: number): void {
+    this.invoiceService.deleteInvoice(invoiceId).subscribe({
+      next: () => {
+        console.log('Facture supprimée avec succès');
+        this.loadInvoices();
+      },
+      error: (error) => {
+        console.error('Erreur lors de la suppression de la facture:', error);
       }
     });
   }
