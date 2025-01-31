@@ -1,8 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { filter } from 'rxjs/operators';
-import { CurrencyPipe } from '@angular/common';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, FormsModule } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
@@ -18,13 +16,13 @@ import { Invoice } from '../../models/invoice';
   styleUrls: ['./invoice-list.component.css']
 })
 export class InvoiceListComponent implements OnInit {
-  @ViewChild('addInvoiceModal') addInvoiceModal: any;
-  @ViewChild('ocrResultsModal') ocrResultsModal: any;
+  @ViewChild('addInvoiceModal') addInvoiceModal!: TemplateRef<Invoice>;
+  @ViewChild('ocrResultsModal') ocrResultsModal!: TemplateRef<Invoice>;
   invoices: Invoice[] = [];
   invoiceForm: FormGroup;
   selectedFile: File | null = null;
-  results: any[] = [];
-  searchTerm: string = '';
+  results: Invoice[] = [];
+  searchTerm = '';
   statusOptions = [
     { value: 'en_cours', label: 'En Cours' },
     { value: 'a_regler', label: 'À Régler' },
@@ -43,7 +41,7 @@ export class InvoiceListComponent implements OnInit {
       email: [''],
       date: [''],
       total: [''],
-      status: [''],
+      status: ['en_cours'],
     });
   }
 
@@ -80,8 +78,9 @@ export class InvoiceListComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.selectedFile = target.files?.[0] || null;
   }
 
   onSubmit(): void {
@@ -99,9 +98,9 @@ export class InvoiceListComponent implements OnInit {
     formData.append('file', this.selectedFile);
 
     this.invoiceService.processOcrFile(formData).subscribe(
-      (response) => {
+      (response: Invoice[]) => {
         console.log('Résultats OCR obtenus avec succès', response);
-        this.results = response.rows;
+        this.results = response;
         this.dialog.closeAll();
         this.openOcrResultsModal();
       },

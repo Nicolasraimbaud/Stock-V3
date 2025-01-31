@@ -1,7 +1,10 @@
 package com.example.backend.model;
 
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,6 +19,9 @@ public class Invoice {
     private String email;
     private LocalDate date;
     private double total;
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'en_cours'")
+    @NotNull
+    @Size(min = 1)
     private String status;
     private String pdfFileName;
 

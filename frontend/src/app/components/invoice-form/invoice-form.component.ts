@@ -11,7 +11,7 @@ import { HttpClient, HttpEventType } from '@angular/common/http';
   styleUrls: ['./invoice-form.component.css']
 })
 export class InvoiceFormComponent {
-  @Output() ocrResults = new EventEmitter<any>();
+  @Output() ocrResults = new EventEmitter<{ rows: { Domaine: string, Appellation: string, Qualite: string, Cuvee: string, Millesime: string, Unite: string, Quantite: number, PrixUnitaire: string, PrixTotal: string }[] }>();
   invoiceForm: FormGroup;
   selectedFile: File | null = null;
   isProcessing = false;
@@ -25,8 +25,11 @@ export class InvoiceFormComponent {
     });
   }
 
-  onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target.files) {
+      this.selectedFile = target.files[0];
+    }
   }
 
   onSubmit(): void {
@@ -44,24 +47,24 @@ export class InvoiceFormComponent {
     formData.append('supplier', this.invoiceForm.get('supplier')?.value || '');
     formData.append('email', this.invoiceForm.get('email')?.value || '');
 
-    // Appel à l'API OCR avec gestion de la progression
     this.http.post('http://localhost:8080/api/ocr/read-file', formData, {
       reportProgress: true,
       observe: 'events'
     }).subscribe({
-      next: (event: any) => {
+      next: (event) => {
         if (event.type === HttpEventType.UploadProgress) {
-          this.uploadProgress = Math.round(100 * event.loaded / event.total);
+          this.uploadProgress = Math.round(100 * event.loaded / (event.total ?? 1));
         }
         if (event.type === HttpEventType.Response) {
-          // Simulation des étapes OCR
           this.currentStep = 2;
           setTimeout(() => {
             this.currentStep = 3;
             setTimeout(() => {
               this.isProcessing = false;
               this.currentStep = 0;
-              this.ocrResults.emit(event.body);
+              if (event.body) {
+                this.ocrResults.emit(event.body as { rows: { Domaine: string, Appellation: string, Qualite: string, Cuvee: string, Millesime: string, Unite: string, Quantite: number, PrixUnitaire: string, PrixTotal: string }[] });
+              }
             }, 1000);
           }, 1000);
         }

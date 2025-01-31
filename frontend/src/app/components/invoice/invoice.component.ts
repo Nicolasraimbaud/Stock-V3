@@ -13,12 +13,12 @@ import { Router } from '@angular/router';
   styleUrls: ['./invoice.component.css']
 })
 export class InvoiceComponent {
-  ocrData = { rows: [] };
+  ocrData = { rows: [] as { Domaine: string, Appellation: string, Qualite: string, Cuvee: string, Millesime: string, Unite: string, Quantite: number, PrixUnitaire: string, PrixTotal: string }[] };
 
   constructor(private router: Router) {}
 
-  handleOcrResults(results: any): void {
-    this.ocrData = results;
+  handleOcrResults(results: { rows: { Domaine: string, Appellation: string, Qualite: string, Cuvee: string, Millesime: string, Unite: string, Quantite: number, PrixUnitaire: string, PrixTotal: string }[] }): void {
+    this.ocrData = { rows: [...results.rows] };
   }
 
   validateChanges(): void {

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, switchMap, map, catchError} from 'rxjs';
+import { Observable, map, catchError } from 'rxjs';
 import { Wine } from '../models/wine';
 
 @Injectable({
@@ -17,18 +17,18 @@ export class WineService {
   }
 
   /* Import all excel data to the database */
-  importExcelData(): Observable<any> {
-    return this.http.get(`${this.excelUrl}/import`);
+  importExcelData(): Observable<void> {
+    return this.http.get<void>(`${this.excelUrl}/import`);
   }
 
   /* Mise à jour du fichier Excel avec plusieurs vins */
-  updateExcelList(wines: Wine[]): Observable<any> {
-    return this.http.post(`${this.excelUrl}/export-batch`, wines).pipe(
-    map(() => wines),
-    catchError((error: any) => {
+  updateExcelList(wines: Wine[]): Observable<Wine[]> {
+    return this.http.post<Wine[]>(`${this.excelUrl}/export-batch`, wines).pipe(
+      map(() => wines),
+      catchError((error: Error) => {
         console.error('Error updating Excel:', error);
         throw error;
-    })
+      })
     );
   }
 }

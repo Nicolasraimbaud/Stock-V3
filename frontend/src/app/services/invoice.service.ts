@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, switchMap, map, catchError} from 'rxjs';
-import { Wine } from '../models/wine';
+import { Observable } from 'rxjs';
 import { Invoice } from '../models/invoice';
 
 @Injectable({
@@ -22,23 +21,23 @@ export class InvoiceService {
     return this.http.post<Invoice>(this.baseUrl, formData);
   }
 
-  processInvoice(formData: FormData): Observable<any> {
-    return this.http.post(`${this.baseUrl}/process`, formData);
+  processInvoice(formData: FormData): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/process`, formData);
   }
 
-  saveUpdatedRows(rows: any[]): Observable<any> {
-    return this.http.post(`${this.baseUrl}/save`, { rows });
+  saveUpdatedRows(rows: Invoice[]): Observable<void> {
+    return this.http.post<void>(`${this.baseUrl}/save`, { rows });
   }
 
-  processOcrFile(formData: FormData): Observable<any> {
-    return this.http.post(`${this.baseUrl}/process-ocr`, formData);
+  processOcrFile(formData: FormData): Observable<Invoice[]> {
+    return this.http.post<Invoice[]>(`${this.baseUrl}/process-ocr`, formData);
   }
 
-  updateInvoiceStatus(invoiceId: number, status: string): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/${invoiceId}/status`, { status });
+  updateInvoiceStatus(invoiceId: number, status: string): Observable<void> {
+    return this.http.patch<void>(`${this.baseUrl}/${invoiceId}/status`, { status });
   }
 
-  deleteInvoice(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+  deleteInvoice(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 }

@@ -35,7 +35,7 @@
         <app-invoice-form (ocrResults)="handleOcrResults($event)"></app-invoice-form>
       </div>
 
-      <div class="section-card preview-section" (click)="validateChanges()">
+      <div class="section-card preview-section" (click)="validateChanges()" (keydown)="validateChanges()" tabindex="0">
         <div class="section-header">
           <h2>Prévisualisation</h2>
           <div class="section-actions">
