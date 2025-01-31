@@ -201,6 +201,7 @@
   transition: all 0.2s ease;
   margin: 0 0.25rem;
   border-color: white;
+  cursor: pointer;
 }
 
 .pdf-button:hover, .delete-button:hover {
