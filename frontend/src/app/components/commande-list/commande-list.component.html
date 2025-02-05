@@ -1,0 +1,23 @@
+<div class="page-container">
+    <header class="page-header">
+      <h1>Gestion des Vins</h1>
+      <div class="header-actions">
+        <a class="action-button" [routerLink]="['/invoice']">
+            <i class="fas fa-file-invoice"></i>
+            Factures
+        </a>
+        <a class="action-button" [routerLink]="['/wines']">
+            <i class="fas fa-file-invoice"></i>
+            Wines
+          </a>
+      </div>
+    </header>
+
+    <h2>Liste des commandes</h2>
+    <button (click)="createTicket()">Créer un nouveau ticket</button>
+    <ul>
+      <li *ngFor="let ticket of tickets" (click)="openTicket(ticket.id)">
+        Table {{ ticket.table }} - Status: {{ ticket.status }}
+      </li>
+    </ul>
+</div>
