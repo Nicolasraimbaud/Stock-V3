@@ -21,7 +21,7 @@ public class Wine {
     private Double pricetosell;
     private Double cost;
     private Integer quantity;
-    private LocalDate updated;
+    private String updated;
     private String supplier;
 
     // Getters and Setters
@@ -113,11 +113,11 @@ public class Wine {
         this.quantity = quantity;
     }
 
-    public LocalDate getUpdated() {
+    public String getUpdated() {
         return updated;
     }
 
-    public void setUpdated(LocalDate updated) {
+    public void setUpdated(String updated) {
         this.updated = updated;
     }
 

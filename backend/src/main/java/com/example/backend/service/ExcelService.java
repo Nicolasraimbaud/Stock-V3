@@ -87,53 +87,64 @@ public class ExcelService {
                 String supplier = row.get("Supplier");
                 String millesimeStr = row.get("Millesime");
                 String updatedStr = row.get("Updated");
-                LocalDate updatedDate = null;
+                String updatedDate = null;
 
                 if (updatedStr != null && !updatedStr.isEmpty()) {
                     try {
-                        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME; // Adapter le format si nécessaire
-                        updatedDate = LocalDate.parse(updatedStr, formatter);
+                        logger.debug("Processing 'Updated' field: {}", updatedStr);
+                        updatedStr = updatedStr.trim();
+                        if (updatedStr.matches("\\d+[.,]\\d+")) {
+                            double serialDate = Double.parseDouble(updatedStr.replace(",", "."));
+                            java.util.Date date = DateUtil.getJavaDate(serialDate);
+                            updatedDate = date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().toString();
+                            logger.debug("Serial date: {}", serialDate);
+                            logger.debug("Java date: {}", date);
+                            logger.debug("Parsed 'Updated' date: {}", updatedDate);
+                        } else {
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+                            updatedDate = LocalDate.parse(updatedStr, formatter).toString();
+                        }
                     } catch (DateTimeParseException e) {
                         logger.error("Invalid date format for 'Updated': {}", updatedStr, e);
                     }
                 }
-    
+
                 if (appellation == null || domaine == null || cuvee == null || millesimeStr == null) {
                     logger.error("Missing required fields in row: {}", row);
                     continue;
                 }
-    
+
                 // Conversion des valeurs numériques
                 Double priceToBuy = parseDouble(row.get("Pricetobuy"));
                 Double priceToSell = parseDouble(row.get("Pricetosell"));
                 Double cost = parseDouble(row.get("Cost"));
                 Integer quantity;
                 Integer millesime;
-    
+
                 try {
                     quantity = Integer.parseInt(row.get("Quantity").split(",")[0].trim());
                 } catch (NumberFormatException e) {
                     logger.error("Invalid 'Quantity' value for row: {}", row);
                     continue;
                 }
-    
+
                 try {
                     millesime = Integer.parseInt(millesimeStr.split(",")[0].trim());
                 } catch (NumberFormatException e) {
                     logger.error("Invalid 'Millésime' value for row: {}", row);
                     continue;
                 }
-    
+
                 if (priceToBuy == null || priceToSell == null || cost == null) {
                     logger.error("Invalid numeric fields in row: {}", row);
                     continue;
                 }
-    
+
                 // Recherche ou création d'un vin
                 Wine wine = wineRepository
                     .findByAppellationAndDomaineAndCuveeAndMillesime(appellation, domaine, cuvee, millesime)
                     .orElse(new Wine());
-    
+
                 // Mise à jour des champs
                 wine.setAppellation(appellation);
                 wine.setDomaine(domaine);
@@ -146,13 +157,13 @@ public class ExcelService {
                 wine.setPricetosell(priceToSell);
                 wine.setCost(cost);
                 wine.setQuantity(quantity);
-                wine.setUpdated(updatedDate);
-    
+                wine.setUpdated(updatedDate != null ? updatedDate : "?");
+
                 // Enregistrement dans la base de données
                 savedWines.add(wineRepository.save(wine));
                 winesToKeep.add(wine);
                 logger.info("Saved/Updated wine: {}", wine);
-    
+
             } catch (Exception e) {
                 logger.error("Error processing wine from row: {}", row, e);
             }
@@ -173,7 +184,7 @@ public class ExcelService {
     }
     
     
-
+    
     public List<Map<String, String>> readExcelFile() {
         List<Map<String, String>> data = new ArrayList<>();
 
@@ -259,7 +270,6 @@ public class ExcelService {
             throw new RuntimeException("Error updating Excel file", e);
         }
     }  
-    
 
     public void saveWine(Wine wine) {
         wineRepository.save(wine);
