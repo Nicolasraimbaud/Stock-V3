@@ -1,12 +1,12 @@
 package com.example.backend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import java.time.LocalDate;
+import com.example.backend.listener.WineListener;
+
+import jakarta.persistence.*;
 
 @Entity
+@Table(name = "wine")
+@EntityListeners(WineListener.class) // 🔥 Écouteur pour détecter les changements
 public class Wine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +23,7 @@ public class Wine {
     private Integer quantity;
     private String updated;
     private String supplier;
+    private String fullname;
 
     // Getters and Setters
     public Long getId() {
@@ -127,6 +128,14 @@ public class Wine {
 
     public void setSupplier(String supplier) {
         this.supplier = supplier;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
 }
