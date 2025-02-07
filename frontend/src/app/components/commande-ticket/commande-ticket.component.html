@@ -1,0 +1,11 @@
+<div class="ticket-detail" *ngIf="ticket">
+    <h2>Détails de la Table {{ ticket.table }}</h2>
+    
+    <ul>
+        <li *ngFor="let item of ticket.items">
+            {{ item.name }} - {{ item.price | currency }} x {{ item.quantity }}
+        </li>
+    </ul>
+    
+    <button class="pay-button" (click)="payTicket()">Payer la note</button>
+</div>

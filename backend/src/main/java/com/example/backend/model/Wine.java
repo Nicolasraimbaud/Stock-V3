@@ -1,12 +1,9 @@
 package com.example.backend.model;
 
-import com.example.backend.listener.WineListener;
-
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "wine")
-@EntityListeners(WineListener.class) // 🔥 Écouteur pour détecter les changements
 public class Wine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +20,8 @@ public class Wine {
     private Integer quantity;
     private String updated;
     private String supplier;
+
+    @Column(nullable = false, updatable = true)  // ✅ Vérifier que la colonne est bien mise à jour
     private String fullname;
 
     // Getters and Setters

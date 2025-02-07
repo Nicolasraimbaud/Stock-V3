@@ -81,3 +81,42 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     backdrop-filter: blur(8px);
   }
+
+  .tickets-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+  }
+  
+  .ticket-card {
+    width: 180px;
+    height: 120px;
+    background: white;
+    border: 2px solid #8b0000;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+  }
+  
+  .ticket-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .create-ticket-btn {
+    padding: 10px 15px;
+    background-color: #8b0000;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .create-ticket-btn:hover {
+    background-color: #a30000;
+  }
+  

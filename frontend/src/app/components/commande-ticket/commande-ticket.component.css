@@ -1,0 +1,21 @@
+.ticket-detail {
+    margin-top: 20px;
+    padding: 15px;
+    background: white;
+    border: 2px solid #8b0000;
+    border-radius: 8px;
+  }
+  
+  .pay-button {
+    padding: 10px 15px;
+    background-color: #228B22;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .pay-button:hover {
+    background-color: #1C6E1C;
+  }
+  

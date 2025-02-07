@@ -1,4 +1,4 @@
-import { Component, Input} from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -33,11 +33,12 @@ export class InvoicePreviewComponent {
       quantity: Number(row.Quantite) || 0,
       pricetobuy: this.convertToNumber(row.PrixUnitaire),
       pricetosell: 0,
-      updated: new Date(),
+      updated: "",
       supplier: '',
       country: '',
       region: '',
-      cost: 0
+      cost: 0,
+      fullname: `${row.Domaine || ''} ${row.Appellation || ''} ${row.Cuvee || ''} ${row.Millesime || ''}`.trim() // Ajout de fullname
     }));
 
     // Vérification des valeurs avant envoi

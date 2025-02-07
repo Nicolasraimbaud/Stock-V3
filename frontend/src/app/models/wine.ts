@@ -7,11 +7,11 @@ export interface Wine {
     pricetobuy: number;
     unite: string;
     quantity: number;
-    updated: Date;
+    updated: string;
     supplier: string;
     country: string;
     region: string;
     cost: number;
     pricetosell: number;
-
+    fullname: string;
 }

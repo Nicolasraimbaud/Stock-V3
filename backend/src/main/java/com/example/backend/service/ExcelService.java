@@ -2,15 +2,13 @@ package com.example.backend.service;
 
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -23,19 +21,26 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import com.example.backend.model.Wine;
 import com.example.backend.repository.WineRepository;
+
+import com.example.backend.model.Article;
+import com.example.backend.repository.ArticleRepository;
 
 @Service
 public class ExcelService {
 
     private WineRepository wineRepository;
+    private final ArticleRepository articleRepository;
     private static final Logger logger = LoggerFactory.getLogger(ExcelService.class);
 
     @Autowired
-    public ExcelService(WineRepository wineRepository) {
+    public ExcelService(WineRepository wineRepository, ArticleRepository articleRepository) {
         this.wineRepository = wineRepository;
+        this.articleRepository = articleRepository;
     }
 
     private String getCellValueAsString(Cell cell) {
@@ -86,28 +91,8 @@ public class ExcelService {
                 String country = row.get("Country");
                 String supplier = row.get("Supplier");
                 String millesimeStr = row.get("Millesime");
-                String updatedStr = row.get("Updated");
+                String fullname = row.get("Full Name");
                 String updatedDate = null;
-
-                if (updatedStr != null && !updatedStr.isEmpty()) {
-                    try {
-                        logger.debug("Processing 'Updated' field: {}", updatedStr);
-                        updatedStr = updatedStr.trim();
-                        if (updatedStr.matches("\\d+[.,]\\d+")) {
-                            double serialDate = Double.parseDouble(updatedStr.replace(",", "."));
-                            java.util.Date date = DateUtil.getJavaDate(serialDate);
-                            updatedDate = date.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate().toString();
-                            logger.debug("Serial date: {}", serialDate);
-                            logger.debug("Java date: {}", date);
-                            logger.debug("Parsed 'Updated' date: {}", updatedDate);
-                        } else {
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-                            updatedDate = LocalDate.parse(updatedStr, formatter).toString();
-                        }
-                    } catch (DateTimeParseException e) {
-                        logger.error("Invalid date format for 'Updated': {}", updatedStr, e);
-                    }
-                }
 
                 if (appellation == null || domaine == null || cuvee == null || millesimeStr == null) {
                     logger.error("Missing required fields in row: {}", row);
@@ -157,12 +142,17 @@ public class ExcelService {
                 wine.setPricetosell(priceToSell);
                 wine.setCost(cost);
                 wine.setQuantity(quantity);
-                wine.setUpdated(updatedDate != null ? updatedDate : "?");
+                wine.setUpdated(updatedDate);
+                wine.setFullname(fullname);
 
                 // Enregistrement dans la base de données
-                savedWines.add(wineRepository.save(wine));
-                winesToKeep.add(wine);
-                logger.info("Saved/Updated wine: {}", wine);
+                Wine savedWine = wineRepository.save(wine);
+                savedWines.add(savedWine);
+                winesToKeep.add(savedWine);
+                logger.info("✅ Saved/Updated wine: {}", savedWine);
+
+                // 🔥 **Ajout de la synchronisation**
+                syncWithArticles(savedWine);
 
             } catch (Exception e) {
                 logger.error("Error processing wine from row: {}", row, e);
@@ -182,7 +172,6 @@ public class ExcelService {
     
         return savedWines;
     }
-    
     
     
     public List<Map<String, String>> readExcelFile() {
@@ -221,10 +210,10 @@ public class ExcelService {
     public void updateExcelFileBatch(List<Wine> wines) {
         try (InputStream inputStream = new ClassPathResource("data.xlsx").getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
-            
+             
             Sheet sheet = workbook.getSheetAt(0);
             int lastRowNum = sheet.getLastRowNum();
-            
+             
             for (Wine wine : wines) {
                 if (wine.getMillesime() == null || 
                     wine.getCuvee() == null || 
@@ -259,8 +248,9 @@ public class ExcelService {
                 row.createCell(6).setCellValue(priceToBuy);
                 row.createCell(9).setCellValue(wine.getQuantity());
                 row.createCell(10).setCellValue(wine.getUpdated());
+                row.createCell(11).setCellValue(wine.getFullname());
             }
-            
+             
             try (FileOutputStream fileOut = new FileOutputStream("src/main/resources/data.xlsx")) {
                 workbook.write(fileOut);
                 logger.info("Excel file updated successfully with new wines");
@@ -285,6 +275,31 @@ public class ExcelService {
         } catch (NumberFormatException e) {
             logger.error("Invalid number format: {}", value, e);
             return null; // Retourne null si la conversion échoue
+        }
+    }
+
+    @Transactional
+    public void syncWithArticles(Wine wine) {
+        System.out.println("🔍 Détection d'un changement dans WINE : " + wine.getFullname());
+
+        if (articleRepository == null) {
+            System.out.println("❌ ERREUR : `articleRepository` est NULL !");
+            return;
+        }
+
+        Optional<Article> existingArticle = articleRepository.findByNom(wine.getFullname());
+
+        if (existingArticle.isPresent()) {
+            Article article = existingArticle.get();
+            article.setPrix(wine.getPricetosell());
+            articleRepository.save(article);
+            System.out.println("✅ Article mis à jour : " + article.getNom() + " à " + article.getPrix() + "€");
+        } else {
+            Article newArticle = new Article();
+            newArticle.setNom(wine.getFullname());
+            newArticle.setPrix(wine.getPricetosell());
+            articleRepository.save(newArticle);
+            System.out.println("✅ Nouvel article ajouté : " + newArticle.getNom() + " à " + newArticle.getPrix() + "€");
         }
     }
 }

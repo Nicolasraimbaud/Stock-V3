@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long> {
-    Optional<Article> findById(Long id);
+    Optional<Article> findByNom(String nom); // 🔍 Recherche un article par son nom
 }
+
 
 

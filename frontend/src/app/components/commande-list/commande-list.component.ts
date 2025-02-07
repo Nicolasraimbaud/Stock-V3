@@ -7,11 +7,10 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-commande-list',
   standalone: true,
-  imports: [CommonModule,RouterModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './commande-list.component.html',
   styleUrls: ['./commande-list.component.css']
 })
-
 export class CommandeListComponent {
   commandeService = inject(CommandeService);
   router = inject(Router);
@@ -19,6 +18,7 @@ export class CommandeListComponent {
 
   createTicket() {
     const newTicketId = this.commandeService.createTicket();
+    this.tickets = this.commandeService.getTickets();  // Mise à jour immédiate
     this.router.navigate(['/commande', newTicketId]);
   }
 

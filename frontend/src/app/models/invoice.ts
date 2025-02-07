@@ -1,6 +1,6 @@
 export interface Invoice {
     id?: number;               // ID de la facture (optionnel)
-    date: Date;                // Date de la facture
+    date: string;                // Date de la facture
     supplier: string;          // Fournisseur
     email: string;             // Email du fournisseur
     total: number;             // Prix total

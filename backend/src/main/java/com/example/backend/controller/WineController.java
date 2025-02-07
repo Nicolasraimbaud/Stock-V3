@@ -49,6 +49,8 @@ public class WineController {
     @PutMapping("/{id}")
     public Wine updateWine(@PathVariable Long id, @RequestBody Wine wine) {
         wine.setId(id);
-        return wineRepository.save(wine);
+        Wine updatedWine = wineRepository.save(wine);
+        return updatedWine;
     }
+
 }
