@@ -25,7 +25,7 @@ export class CommandeDetailComponent {
   payTicket() {
     if (this.ticket) {
       this.commandeService.closeTicket(this.ticket.id);
-      alert('Ticket payé !');
+      alert('💰 Ticket payé avec succès !');
     }
   }
 }

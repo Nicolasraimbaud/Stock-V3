@@ -1,26 +1,48 @@
 <div class="page-container">
   <header class="page-header">
-    <h1>Gestion des Commandes</h1>
-    <div class="header-actions">
-      <a class="action-button" [routerLink]="['/invoice']">
-          <i class="fas fa-file-invoice"></i>
-          Factures
-      </a>
-      <a class="action-button" [routerLink]="['/wines']">
-          <i class="fas fa-file-invoice"></i>
-          Wines
-      </a>
-    </div>
+      <h1>Gestion des Commandes</h1>
+      <div class="header-actions">
+          <a class="action-button" [routerLink]="['/invoice']">Factures</a>
+          <a class="action-button" [routerLink]="['/wines']">Wines</a>
+      </div>
   </header>
 
   <h2>Liste des commandes</h2>
   <button class="create-ticket-btn" (click)="createTicket()">Créer un nouveau ticket</button>
 
-  <!-- Conteneur des tickets -->
   <div class="tickets-container">
-    <div class="ticket-card" *ngFor="let ticket of tickets" (click)="openTicket(ticket.id)">
-      <h3>Table {{ ticket.table }}</h3>
-      <p>Status: {{ ticket.status }}</p>
-    </div>
+      <div class="ticket-card" *ngFor="let ticket of tickets" (click)="selectTicket(ticket)">
+          <h3>Table {{ ticket.table }}</h3>
+          <p>Status: {{ ticket.status }}</p>
+      </div>
+  </div>
+
+  <!-- Détail du ticket sélectionné -->
+  <div *ngIf="selectedTicket" class="ticket-detail">
+      <h2>Détails de la Table {{ selectedTicket.table }}</h2>
+
+      <div class="ticket-content">
+          <!-- Colonne gauche : Liste des articles -->
+          <div class="ticket-items">
+              <h3>Articles commandés</h3>
+              <ul>
+                  <li *ngFor="let item of selectedTicket.items">
+                      {{ item.name }} - {{ item.price | currency }} x {{ item.quantity }}
+                  </li>
+              </ul>
+              <p class="total">Total: {{ getTotalPrice(selectedTicket.items) | currency }}</p>
+          </div>
+
+          <!-- Colonne droite : Recherche et ajout -->
+          <div class="ticket-add-items">
+              <h3>Ajouter un article</h3>
+              <input type="text" [(ngModel)]="searchQuery" placeholder="Rechercher un article..." (input)="searchArticles()">
+              <ul class="search-results">
+                  <li *ngFor="let article of searchResults" (click)="addItemToTicket(article)">
+                      {{ article.nom }} - {{ article.prix | currency }}
+                  </li>
+              </ul>
+          </div>
+      </div>
   </div>
 </div>

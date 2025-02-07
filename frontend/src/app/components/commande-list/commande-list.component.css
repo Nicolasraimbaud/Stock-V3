@@ -1,122 +1,157 @@
+/* 🎨 Arrière-plan */
 .page-container {
-    min-height: 100vh;
-    padding: 2rem;
-    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
-  }
-  
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding: 1.5rem 2rem;
-    background: white;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    backdrop-filter: blur(8px);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  
-  .page-header:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  }
-  
-  h1 {
-    font-size: 1.875rem;
-    font-weight: 700;
-    background: linear-gradient(45deg, #8b0000, #b91c1c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    letter-spacing: -0.025em;
-    margin: 0;
-  }
-  
-  .header-actions {
-    display: flex;
-    gap: 1rem;
-  }
-  
-  .action-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: #8b0000;
-    color: white;
-    border: none;
-    border-radius: 0.75rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgb(139 0 0 / 0.2);
-  }
-  
-  .action-button:hover {
-    background: #7a001f;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgb(139 0 0 / 0.3);
-  }
-  
-  .action-button:active {
-    transform: translateY(0);
-  }
-  
-  .action-button i {
-    font-size: 1rem;
-  }
-  
-  .main-content {
-    margin: 0 auto;
-    max-width: 1800px;
-  }
-  
-  .section-card {
-    background: white;
-    border-radius: 1rem;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    backdrop-filter: blur(8px);
-  }
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+}
 
-  .tickets-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 20px;
-  }
-  
-  .ticket-card {
-    width: 180px;
-    height: 120px;
-    background: white;
-    border: 2px solid #8b0000;
-    border-radius: 8px;
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s;
-  }
-  
-  .ticket-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .create-ticket-btn {
-    padding: 10px 15px;
-    background-color: #8b0000;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .create-ticket-btn:hover {
-    background-color: #a30000;
-  }
-  
+/* ✅ Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.page-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* ✅ Titres */
+h1, h2, h3 {
+  font-weight: 700;
+  margin: 0;
+}
+
+h1 {
+  font-size: 1.875rem;
+  background: linear-gradient(45deg, #8b0000, #b91c1c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+/* ✅ Bouton "Créer un nouveau ticket" */
+.create-ticket-btn {
+  background: linear-gradient(45deg, #8b0000, #b91c1c);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.create-ticket-btn:hover {
+  background: linear-gradient(45deg, #7a001f, #991b1b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.create-ticket-btn:active {
+  transform: translateY(0);
+}
+
+/* ✅ Conteneur des tickets */
+.tickets-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* ✅ Style des tickets */
+.ticket-card {
+  width: 180px;
+  height: 120px;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.ticket-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 6px 14px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ Détails des commandes */
+.ticket-detail {
+  margin-top: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ Contenu des commandes */
+.ticket-content {
+  display: flex;
+  gap: 20px;
+}
+
+/* ✅ Articles commandés & Ajout d'articles */
+.ticket-items, .ticket-add-items {
+  flex: 1;
+  background: #f8f8f8;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+/* ✅ Barre de recherche */
+.ticket-add-items input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+/* ✅ Articles suggérés */
+.search-results {
+  list-style: none;
+  padding: 0;
+}
+
+.search-results li {
+  cursor: pointer;
+  padding: 8px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 5px;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.search-results li:hover {
+  background: #f1f5f9;
+  transform: translateY(-2px);
+}
+
+/* ✅ Total */
+.total {
+  font-weight: bold;
+  font-size: 18px;
+  margin-top: 10px;
+  color: #8b0000;
+}

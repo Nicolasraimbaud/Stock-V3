@@ -34,4 +34,13 @@ export class CommandeService {
       ticket.items.push(product);
     }
   }
+
+  /** ✅ Nouvelle méthode pour fermer un ticket */
+  closeTicket(ticketId: number) {
+    const ticket = this.getTicketById(ticketId);
+    if (ticket) {
+      ticket.status = 'Payé';  // Change le statut à "Payé"
+      this.tickets = this.tickets.filter(t => t.id !== ticketId); // Optionnel : Supprimer le ticket après paiement
+    }
+  }
 }
